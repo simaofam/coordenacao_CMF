@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escola Municipal de Natação de Felgueiras</title>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Barlow+Condensed:wght@500;700&display=swap');
+:root{
+  --bd:#0a3d6b;--bm:#1565c0;--bp:#1e88e5;--aq:#00acc1;--aql:#e0f7fa;
+  --w:#fff;--g1:#f4f6f9;--g2:#e8ecf1;--g4:#9aa5b4;--g7:#3d4a5c;--g9:#1a2332;
+  --gn:#43a047;--rd:#e53935;--or:#fb8c00;--sw:230px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--g1);color:var(--g9);display:flex;flex-direction:column;min-height:100vh;}
+#tb{background:var(--g9);color:var(--w);padding:.4rem 1.5rem;font-size:.78rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
+.tb-lbl{opacity:.55;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;}
+.tb-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--w);padding:.22rem .7rem;border-radius:4px;cursor:pointer;font-size:.73rem;font-family:'Inter',sans-serif;}
+.tb-btn:hover{background:rgba(255,255,255,.22);}
+#tb-right{margin-left:auto;display:flex;gap:.5rem;align-items:center;}
+.ep-nav{display:flex;align-items:center;gap:.4rem;}
+.ep-nav button{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--w);width:22px;height:22px;border-radius:3px;cursor:pointer;font-size:.85rem;font-family:'Inter',sans-serif;}
+.ep-nav button:hover{background:rgba(255,255,255,.25);}
+.ep-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:.15rem .6rem;font-size:.72rem;font-weight:700;min-width:90px;text-align:center;}
+header{background:linear-gradient(135deg,var(--bd) 0%,var(--bm) 60%,var(--aq) 100%);color:var(--w);padding:.65rem 1.5rem;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.logo-img{height:48px;object-fit:contain;background:white;border-radius:6px;padding:3px;}
+.htitle{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;line-height:1.2;}
+.htitle span{font-weight:300;font-size:.72rem;letter-spacing:.12em;opacity:.8;display:block;}
+#pbadge{margin-left:auto;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.3rem .9rem;font-size:.78rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.4rem;white-space:nowrap;color:white;font-family:'Inter',sans-serif;}
+#pbadge:hover{background:rgba(255,255,255,.25);}
+.layout{display:flex;flex:1;}
+#sb{width:var(--sw);flex-shrink:0;background:var(--bd);display:flex;flex-direction:column;padding-top:.5rem;}
+.ni{display:flex;align-items:center;gap:.75rem;padding:.65rem 1.25rem;color:rgba(255,255,255,.7);font-size:.82rem;font-weight:500;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif;border-left:3px solid transparent;}
+.ni:hover{background:rgba(255,255,255,.08);color:var(--w);}
+.ni.active{background:rgba(255,255,255,.12);color:var(--w);border-left-color:var(--aq);font-weight:700;}
+.ni-icon{font-size:1rem;width:20px;text-align:center;}
+.ns-lbl{font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.35);padding:.5rem 1.25rem .2rem;}
+.ndiv{border:none;border-top:1px solid rgba(255,255,255,.1);margin:.4rem .75rem;}
+#main{flex:1;overflow-y:auto;padding:1.5rem;}
+.tab{display:none;}.tab.active{display:block;}
+.ttitle{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:700;color:var(--bd);text-transform:uppercase;letter-spacing:.04em;border-bottom:3px solid var(--aq);padding-bottom:.5rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem;}
+.ttitle .exp-grp{margin-left:auto;display:flex;gap:.5rem;}
+.card{background:var(--w);border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;border-radius:7px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:.83rem;font-weight:600;}
+.bp{background:var(--bp);color:var(--w);}.bp:hover{background:var(--bm);}
+.bs{background:var(--gn);color:var(--w);}
+.br{background:var(--rd);color:var(--w);}
+.bo{background:transparent;color:var(--bp);border:1.5px solid var(--bp);}.bo:hover{background:var(--aql);}
+.bsm{padding:.3rem .7rem;font-size:.76rem;}
+.exp-btn{background:var(--g7);color:var(--w);padding:.4rem .85rem;border-radius:6px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:.74rem;font-weight:600;display:inline-flex;align-items:center;gap:.3rem;}
+.exp-btn:hover{background:var(--g9);}
+.exp-pdf{background:#b71c1c;}.exp-pdf:hover{background:#7f0000;}
+.exp-xls{background:#2e7d32;}.exp-xls:hover{background:#1b5e20;}
+.toolbar{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;margin-bottom:1.25rem;}
+label{font-size:.82rem;font-weight:600;color:var(--g7);display:block;margin-bottom:.3rem;}
+input[type=text],input[type=email],input[type=tel],select,textarea{width:100%;padding:.5rem .75rem;border:1.5px solid var(--g2);border-radius:7px;font-family:'Inter',sans-serif;font-size:.85rem;color:var(--g9);background:var(--w);}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--bp);box-shadow:0 0 0 3px rgba(30,136,229,.12);}
+.fr{display:grid;gap:1rem;margin-bottom:1rem;}.fc2{grid-template-columns:1fr 1fr;}.fg{display:flex;flex-direction:column;}
+.cg{display:flex;flex-wrap:wrap;gap:.5rem;}
+.cp input{display:none;}
+.cp label{background:var(--g1);border:1.5px solid var(--g2);border-radius:20px;padding:.3rem .85rem;cursor:pointer;font-size:.8rem;font-weight:500;display:inline-block;margin:0;}
+.cp input:checked + label{background:var(--bp);border-color:var(--bp);color:var(--w);}
+.sw{overflow-x:auto;}
+.sg{border-collapse:collapse;font-size:.78rem;min-width:1300px;}
+.sg th{background:var(--bd);color:var(--w);padding:.55rem .8rem;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--bm);}
+.sg th.sat-h{background:#1a5276;}
+.sg th.sun-h{background:#7d3c98;}
+.sg .ch{background:var(--bm);color:var(--w);font-weight:700;text-align:center;padding:.5rem .6rem;font-size:.82rem;white-space:nowrap;border:1px solid var(--bd);vertical-align:middle;min-width:70px;cursor:pointer;transition:background .15s;}
+.sg .ch:hover{background:var(--bd);}
+.sg .ch.sat{background:#1a5276;}.sg .ch.sat:hover{background:#0e2f44;}
+.sg .ch.sun{background:#7d3c98;}.sg .ch.sun:hover{background:#5b2872;}
+.sg .ch.empty{background:var(--g2);color:var(--g4);cursor:default;font-style:italic;font-weight:400;font-size:.7rem;}
+.sg .ch.empty:hover{background:var(--g2);}
+.sg .dc{border:1px solid var(--g2);padding:.3rem .35rem;vertical-align:top;min-width:140px;background:var(--w);}
+.sg .dc.empty{background:var(--g1);}
+.sl{display:flex;align-items:center;gap:.3rem;background:var(--aql);border-radius:5px;padding:.25rem .4rem;border-left:3px solid var(--aq);margin-bottom:2px;}
+.sl .nt{font-size:.7rem;font-weight:700;padding:.1rem .35rem;border-radius:3px;background:var(--aq);color:var(--w);white-space:nowrap;min-width:52px;text-align:center;}
+.sl select{flex:1;font-size:.72rem;padding:.2rem .3rem;border-radius:4px;height:auto;border:1px solid var(--g2);}
+.sl .rs{background:none;border:none;cursor:pointer;color:var(--g4);font-size:.9rem;padding:0 .2rem;}.sl .rs:hover{color:var(--rd);}
+.as{background:none;border:1.5px dashed var(--g4);border-radius:5px;color:var(--g4);font-size:.72rem;padding:.2rem .5rem;cursor:pointer;width:100%;text-align:center;margin-top:2px;}.as:hover{border-color:var(--bp);color:var(--bp);}
+.l3c{background:#b3e5fc;border-left-color:#0288d1;}.l2a{background:#c8e6c9;border-left-color:#388e3c;}
+.l2c{background:#dcedc8;border-left-color:#689f38;}.l1a{background:#fff9c4;border-left-color:#f9a825;}
+.l1c{background:#ffe0b2;border-left-color:#e65100;}.lin{background:#f8bbd0;border-left-color:#c2185b;}
+.lbe{background:#e1bee7;border-left-color:#7b1fa2;}.lhi{background:#b2dfdb;border-left-color:#00695c;}
+.t3c{background:#0288d1;}.t2a{background:#388e3c;}.t2c{background:#689f38;}
+.t1a{background:#f9a825;color:#333;}.t1c{background:#e65100;}.tin{background:#c2185b;}
+.tbe{background:#7b1fa2;}.thi{background:#00695c;}
+.leg{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;}
+.li{display:flex;align-items:center;gap:.35rem;font-size:.75rem;font-weight:500;}
+.ld{width:12px;height:12px;border-radius:3px;}
+.dsg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.dsc{background:var(--w);border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);padding:1rem;border-top:4px solid var(--bp);text-align:center;}
+.dsc .num{font-size:2rem;font-weight:700;color:var(--bd);font-family:'Barlow Condensed',sans-serif;}
+.dsc .lbl{font-size:.7rem;color:var(--g4);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:.2rem;}
+.pag{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.75rem;}
+.pac{background:var(--w);border-radius:8px;padding:.75rem 1rem;box-shadow:0 1px 4px rgba(0,0,0,.07);display:flex;align-items:center;gap:.75rem;border-left:4px solid var(--bp);}
+.pav{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--w);flex-shrink:0;}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.25rem;}
+.pc{background:var(--w);border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden;border-top:4px solid var(--bp);}
+.pch{padding:1rem 1.25rem .75rem;display:flex;align-items:center;gap:.85rem;background:var(--g1);border-bottom:1px solid var(--g2);}
+.pca{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--w);font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;flex-shrink:0;}
+.pcb{padding:1rem 1.25rem;}
+.pir{display:flex;gap:.5rem;align-items:center;font-size:.8rem;margin-bottom:.4rem;color:var(--g7);}
+.pts{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem;}
+.pt{background:var(--aql);color:var(--bd);border-radius:20px;padding:.15rem .6rem;font-size:.72rem;font-weight:600;}
+.pcf{padding:.75rem 1.25rem;border-top:1px solid var(--g2);display:flex;gap:.5rem;}
+.is{border-collapse:collapse;width:100%;font-size:.8rem;}
+.is th{background:var(--bd);color:var(--w);padding:.5rem .75rem;text-align:center;font-family:'Barlow Condensed',sans-serif;}
+.is td{border:1px solid var(--g2);padding:.35rem .5rem;text-align:center;height:36px;}
+.is .hc{background:var(--bm);color:var(--w);font-weight:700;}
+.ia{background:var(--aql);border-radius:4px;padding:.2rem .35rem;font-size:.72rem;font-weight:600;color:var(--bd);display:inline-block;}
+.fs{display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;border-radius:6px;border:1.5px solid var(--g2);margin-bottom:.35rem;cursor:pointer;}
+.fs:hover{border-color:var(--rd);background:#fff5f5;}.fs.sel{border-color:var(--rd);background:#ffebee;}
+.fs .fl{flex:1;font-size:.83rem;font-weight:500;}
+.fc{width:18px;height:18px;accent-color:var(--rd);cursor:pointer;}
+.pp{background:var(--w);border:1px solid #ddd;border-radius:8px;padding:1.25rem;font-size:.82rem;}
+.pp h4{font-size:1rem;color:var(--bd);margin-bottom:.75rem;}
+.pp .fi{display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid #eee;}
+.spe{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+.sac{background:var(--w);border-radius:8px;border:1.5px solid var(--g2);padding:.75rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between;}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;}
+.mo.open{display:flex;}
+.md{background:var(--w);border-radius:12px;width:min(680px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.mh{padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;background:var(--bd);color:var(--w);border-radius:12px 12px 0 0;}
+.mh h3{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;letter-spacing:.04em;}
+.mc{background:none;border:none;color:var(--w);font-size:1.4rem;cursor:pointer;opacity:.7;}.mc:hover{opacity:1;}
+.mb{padding:1.5rem;}
+.mf{padding:1rem 1.5rem;border-top:1px solid var(--g2);display:flex;gap:.75rem;justify-content:flex-end;}
+.po{border:2px solid var(--g2);border-radius:10px;padding:1rem 1.25rem;cursor:pointer;margin-bottom:.75rem;display:flex;align-items:center;gap:1rem;}
+.po:hover{border-color:var(--bp);}
+.po.active{border-color:var(--bp);background:var(--aql);}
+.po h4{font-weight:700;color:var(--bd);}
+#toast{position:fixed;bottom:2rem;right:2rem;background:var(--gn);color:var(--w);padding:.75rem 1.25rem;border-radius:8px;font-size:.85rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);transform:translateY(100px);opacity:0;transition:all .3s;z-index:300;pointer-events:none;}
+#toast.show{transform:translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<div id="tb">
+  <span class="tb-lbl">Época</span>
+  <div class="ep-nav">
+    <button onclick="changeEpoca(-1)">&#8249;</button>
+    <div class="ep-badge" id="epLabel">2025/2026</div>
+    <button onclick="changeEpoca(1)">&#8250;</button>
+  </div>
+  <div id="tb-right">
+    <span class="tb-lbl">Backups:</span>
+    <button class="tb-btn" onclick="exportBackup()">&#8595; Exportar</button>
+    <button class="tb-btn" onclick="document.getElementById('importFile').click()">&#8593; Importar</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
+  </div>
+</div>
+
+<header>
+  <img src="data:image/jpeg;base64,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SN90/SoozhsetfN9nJtk2Ho3868x1W38613qPnj5HuO9ZWnzeXPsJ+V+Px7VLV+sGtaiiiiikb7p+lIfun6UV5TqH/IRuv8Ars//AKEa900v/kFWf/XvH/6CK9m0z/kGWn/XFP8A0EVGepqvVqrNJWLdf8fUv+8aSikqLvRRRXsfg3/kVNO/65f1NTx/cFFSr90VtU6iloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooqO4/495P8AcP8AKmv/AKtvoaRvun6VBXzQOOlefdqwKmU5XNaUMnmRhu/f61zt/b/ZrpkA+Q/Mv0ratJvOgVj94cN9aWpKrVNRSN90/SkP3T9KK+eta1G9TW79VupQBcyAAN0+Y17jphP9lWfP/LCP/wBBFezaZ/yDLT/rin/oIqAk5NUv7Tvv+fub/vo1ayfWrNGTU1hDq2q3XkWKXFzM3JCc/iT2+poG5jgZNFAyTxXofh/4bz/LPr98/r9ngf8A9Cb/AA/OpUhPVj+Aop6x/wB416JaW0Fnax21rGI4Y12oo7CpgMDAoqQcVLRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRUdx/x7yf7h/lTX/wBW30NI33T9Kgr5nrz6sCnRnDY9as2cm2TYejfzqlqtv51qXUfPHyPcd6tafN5c+0/dfj8e1S1erBrWopG+6fpSH7p+lFfPV3pt7qnia/t9PtpbiU3MnyoucfMeSew+te46WCdLswBn9xH/AOgivZtM/wCQZaf9cU/9BFQYJY4Heu38P/C37s+v3Hv9ngP/AKE3+H51fSHu5/AVZp6x/wB6vRNP06y0y2FvYW0VvEP4UXGfc+p+tSgBRgDFFSAAdBVqlooooooozRmiiiiiiiiiiiiiiiiiimu6xoXkYKqjJYnAAprukaM8jBVUZLMcACikJCgliAB1Jqrp2q2OqCZtPuFnSF/Ldk+7uxnAPfr2qppurWGqrM2n3CTpC/lu6fd3Yzwe/XtSKwbO05xUdvcw3IcwSBwjbSR0zVyrtLUtFFFFFFFFFFFFFFFFFFFF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9u0VNiRzlCFHqSFBJ46k0KpH8RP1ogt3hbLXMsoAwFfHH5DmmPolu+lXenGSXyrp5HdsjcC7Fjjj1NRvoNs+kXmmmSXyruSR3bI3AuxY449TSbBtK+tNNnGbWW33NtlLEnuMnNWtRs01Cwms5HdI5l2uUODt7j8Rx+NW9Ssk1HT5rKWSRI512OUODt7j8Rx+NKw3Aj1qW4hE8DxMzBXGCR1xUMGkWdrqC3lpElu3lGJkiQKrgkEEgDqMcfU1Db6NZWupLe2cKW7eUYnSJFVHBIIJAHUY4PuaAoDZAxTEtIY5xNEojO0qQoAB+tN07Sjp9zNJHe3DwyyPJ5DhNqs7biQQM9c96ZpukHTrqeSK+uXhmkkl+zuE2KztuJBC56k96RV2k8nB7UkFr5Ejss0hRmZthxgEnPpmtGtOnVYoooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooor/9k=" alt="CMF" class="logo-img">
+  <div class="htitle">Escola Municipal de Natação<span>Felgueiras</span></div>
+  <button id="pbadge" onclick="openPoolModal()">&#x1F3CA; <span id="pname">Piscina Municipal de Felgueiras</span> &#9660;</button>
+</header>
+
+<div class="layout">
+<nav id="sb">
+  <div class="ns-lbl">Principal</div>
+  <button class="ni active" onclick="showTab('t0',this)"><span class="ni-icon">&#128202;</span> Dashboard</button>
+  <hr class="ndiv">
+  <div class="ns-lbl">Gest&#227;o</div>
+  <button class="ni" onclick="showTab('t1',this)"><span class="ni-icon">&#128203;</span> Mapa de Turmas</button>
+  <button class="ni" onclick="showTab('t2',this)"><span class="ni-icon">&#128101;</span> Equipa T&#233;cnica</button>
+  <button class="ni" onclick="showTab('t3',this)"><span class="ni-icon">&#128197;</span> Hor&#225;rio Individual</button>
+  <hr class="ndiv">
+  <div class="ns-lbl">Opera&#231;&#245;es</div>
+  <button class="ni" onclick="showTab('t4',this)"><span class="ni-icon">&#10060;</span> Faltas</button>
+  <button class="ni" onclick="showTab('t5',this)"><span class="ni-icon">&#128260;</span> Substitui&#231;&#245;es</button>
+</nav>
+
+<div id="main">
+
+<div id="t0" class="tab active">
+  <div class="ttitle">&#128202; Dashboard
+    <div class="exp-grp">
+      <button class="exp-btn exp-pdf" onclick="exportPDF('dash')">&#128196; PDF</button>
+      <button class="exp-btn exp-xls" onclick="exportXLS('dash')">&#128202; Excel</button>
+    </div>
+  </div>
+  <div id="dPool" style="font-size:.85rem;font-weight:700;color:var(--bd);margin-bottom:.75rem"></div>
+  <div class="dsg" id="dStats"></div>
+  <div class="card">
+    <div style="font-weight:700;font-size:.9rem;color:var(--bd);margin-bottom:1rem">Carga de Aulas por Professor</div>
+    <div class="pag" id="dProfs"></div>
+  </div>
+  <div class="card">
+    <div style="font-weight:700;font-size:.9rem;color:var(--bd);margin-bottom:.75rem">Distribui&#231;&#227;o por N&#237;vel</div>
+    <div id="dLvls" style="display:flex;flex-wrap:wrap;gap:.75rem"></div>
+  </div>
+</div>
+
+<div id="t1" class="tab">
+  <div class="ttitle">&#128203; Mapa de Distribui&#231;&#227;o de Turmas
+    <div class="exp-grp">
+      <button class="exp-btn exp-pdf" onclick="exportPDF('mapa')">&#128196; PDF</button>
+      <button class="exp-btn exp-xls" onclick="exportXLS('mapa')">&#128202; Excel</button>
+    </div>
+  </div>
+  <div class="leg">
+    <div class="li"><div class="ld" style="background:#0288d1"></div>3C</div>
+    <div class="li"><div class="ld" style="background:#388e3c"></div>2A</div>
+    <div class="li"><div class="ld" style="background:#689f38"></div>2C</div>
+    <div class="li"><div class="ld" style="background:#f9a825"></div>1A</div>
+    <div class="li"><div class="ld" style="background:#e65100"></div>1C</div>
+    <div class="li"><div class="ld" style="background:#c2185b"></div>Inicia&#231;&#227;o</div>
+    <div class="li"><div class="ld" style="background:#7b1fa2"></div>Beb&#233;s</div>
+    <div class="li"><div class="ld" style="background:#00695c"></div>Hidro</div>
+  </div>
+  <div class="toolbar">
+    <button class="btn bp" onclick="addHorario('week')">+ Hor&#225;rio Semana</button>
+    <button class="btn bp" style="background:#1a5276" onclick="addHorario('sat')">+ Hor&#225;rio S&#225;bado</button>
+    <button class="btn bp" style="background:#7d3c98" onclick="addHorario('sun')">+ Hor&#225;rio Domingo</button>
+    <button class="btn bo" onclick="saveAll()">&#128190; Guardar</button>
+    <div style="font-size:.75rem;color:var(--g4);margin-left:auto"><span style="color:var(--bp);font-weight:600">Dica:</span> clique numa hora para editar/eliminar</div>
+  </div>
+  <div class="card">
+    <div class="sw">
+      <table class="sg"><thead><tr>
+        <th>Hora</th><th>Segunda</th><th>Ter&#231;a</th><th>Quarta</th><th>Quinta</th><th>Sexta</th>
+        <th class="sat-h">Hora Sáb</th><th class="sat-h">S&#225;bado</th>
+        <th class="sun-h">Hora Dom</th><th class="sun-h">Domingo</th>
+      </tr></thead><tbody id="sBody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<div id="t2" class="tab">
+  <div class="ttitle">&#128101; Equipa T&#233;cnica
+    <div class="exp-grp">
+      <button class="exp-btn exp-pdf" onclick="exportPDF('equipa')">&#128196; PDF</button>
+      <button class="exp-btn exp-xls" onclick="exportXLS('equipa')">&#128202; Excel</button>
+    </div>
+  </div>
+  <div class="toolbar"><button class="btn bp" onclick="openProfModal(null)">+ Adicionar Professor</button></div>
+  <div class="pg" id="pGrid"></div>
+</div>
+
+<div id="t3" class="tab">
+  <div class="ttitle">&#128197; Hor&#225;rio Individual
+    <div class="exp-grp">
+      <button class="exp-btn exp-pdf" onclick="exportPDF('indiv')">&#128196; PDF</button>
+      <button class="exp-btn exp-xls" onclick="exportXLS('indiv')">&#128202; Excel</button>
+    </div>
+  </div>
+  <div class="card" style="max-width:380px">
+    <label>Selecionar Professor</label>
+    <select id="ps3" onchange="renderIndiv()"><option value="">&#8212; Escolher &#8212;</option></select>
+  </div>
+  <div id="indivWrap" class="card" style="display:none">
+    <div id="indivTitle" style="font-weight:700;font-size:1rem;color:var(--bd);margin-bottom:1rem"></div>
+    <div style="overflow-x:auto">
+      <table class="is"><thead><tr>
+        <th>Hora</th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>S&#225;b</th><th>Dom</th>
+      </tr></thead><tbody id="indivBody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<div id="t4" class="tab">
+  <div class="ttitle">&#10060; Registo de Faltas
+    <div class="exp-grp">
+      <button class="exp-btn exp-pdf" onclick="exportPDF('faltas')">&#128196; PDF</button>
+      <button class="exp-btn exp-xls" onclick="exportXLS('faltas')">&#128202; Excel</button>
+    </div>
+  </div>
+  <div class="card" style="max-width:380px">
+    <label>Professor em Falta</label>
+    <select id="psF" onchange="renderFaltas()"><option value="">&#8212; Escolher &#8212;</option></select>
+  </div>
+  <div id="fWrap" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+      <div class="card">
+        <div style="font-weight:700;font-size:.9rem;color:var(--bd);margin-bottom:1rem">Aulas em Falta</div>
+        <div id="fList"></div>
+        <div style="margin-top:1rem;display:flex;gap:.75rem">
+          <button class="btn bo" onclick="clearFaltas()">Limpar</button>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-weight:700;font-size:.9rem;color:var(--bd);margin-bottom:1rem">Resumo</div>
+        <div id="fSumm" class="pp"><div style="color:var(--g4);font-size:.85rem">Selecione aulas.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="t5" class="tab">
+  <div class="ttitle">&#128260; Gest&#227;o de Substitui&#231;&#245;es
+    <div class="exp-grp">
+      <button class="exp-btn exp-pdf" onclick="exportPDF('sub')">&#128196; PDF</button>
+      <button class="exp-btn exp-xls" onclick="exportXLS('sub')">&#128202; Excel</button>
+    </div>
+  </div>
+  <div class="card" style="max-width:380px;margin-bottom:1.5rem">
+    <label>Professor a substituir</label>
+    <select id="psSub" onchange="renderSub()"><option value="">&#8212; Escolher &#8212;</option></select>
+  </div>
+  <div id="subWrap" style="display:none">
+    <div class="spe">
+      <div class="card">
+        <div style="font-weight:700;color:var(--bd);margin-bottom:1rem">Aulas que precisam de substituto</div>
+        <div id="subList"></div>
+      </div>
+      <div class="card">
+        <div style="font-weight:700;color:var(--bd);margin-bottom:1rem">Professores Dispon&#237;veis</div>
+        <div id="subAvail"></div>
+        <div style="margin-top:1rem"><button class="btn bp" onclick="confirmarSub()">&#10003; Confirmar</button></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:1.5rem">
+      <div style="font-weight:700;color:var(--bd);margin-bottom:1rem">Mapa com Substitui&#231;&#245;es</div>
+      <div id="subMapa" style="overflow-x:auto"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<!-- MODAL PROF -->
+<div class="mo" id="mProf">
+  <div class="md">
+    <div class="mh"><h3 id="mProfTitle">Professor</h3><button class="mc" onclick="closePM()">&#215;</button></div>
+    <div class="mb">
+      <div class="fr fc2">
+        <div class="fg"><label>Nome Completo *</label><input type="text" id="pNome"></div>
+        <div class="fg"><label>Nome Abreviado (mapa)</label><input type="text" id="pAbrev" maxlength="12"></div>
+      </div>
+      <div class="fr fc2">
+        <div class="fg"><label>Telem&#243;vel</label><input type="tel" id="pTel"></div>
+        <div class="fg"><label>Email</label><input type="email" id="pEmail"></div>
+      </div>
+      <div class="fg" style="margin-bottom:1rem">
+        <label>Especialidades</label>
+        <div class="cg">
+          <div class="cp"><input type="checkbox" id="e-beb" value="Beb&#233;s"><label for="e-beb">Beb&#233;s</label></div>
+          <div class="cp"><input type="checkbox" id="e-cri" value="Crian&#231;as"><label for="e-cri">Crian&#231;as</label></div>
+          <div class="cp"><input type="checkbox" id="e-adu" value="Adultos"><label for="e-adu">Adultos</label></div>
+          <div class="cp"><input type="checkbox" id="e-hid" value="Hidrogin&#225;stica"><label for="e-hid">Hidrogin&#225;stica</label></div>
+          <div class="cp"><input type="checkbox" id="e-boc" value="Boccia"><label for="e-boc">Boccia</label></div>
+          <div class="cp"><input type="checkbox" id="e-gin" value="Gin&#225;stica"><label for="e-gin">Gin&#225;stica</label></div>
+          <div class="cp"><input type="checkbox" id="e-ada" value="Nata&#231;&#227;o Adaptada"><label for="e-ada">Nat. Adaptada</label></div>
+        </div>
+        <input type="text" id="eExtra" placeholder="Outras..." style="margin-top:.5rem">
+      </div>
+      <div class="fg" style="margin-bottom:1rem">
+        <label>Disponibilidade</label>
+        <div class="cg">
+          <div class="cp"><input type="radio" name="dp" id="d-mnh" value="Manh&#227;"><label for="d-mnh">Manh&#227;</label></div>
+          <div class="cp"><input type="radio" name="dp" id="d-trd" value="Tarde/Noite"><label for="d-trd">Tarde/Noite</label></div>
+          <div class="cp"><input type="radio" name="dp" id="d-amb" value="Ambos"><label for="d-amb">Ambos</label></div>
+        </div>
+        <input type="text" id="dExtra" placeholder="Observa&#231;&#245;es..." style="margin-top:.5rem">
+      </div>
+      <div class="fg"><label>Observa&#231;&#245;es</label><textarea id="pObs" rows="2"></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="btn bo" onclick="closePM()">Cancelar</button>
+      <button class="btn bp" onclick="saveProf()">&#128190; Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL POOL -->
+<div class="mo" id="mPool">
+  <div class="md">
+    <div class="mh"><h3>Selecionar Piscina</h3><button class="mc" onclick="closePool()">&#215;</button></div>
+    <div class="mb"><div id="poolOpts"></div></div>
+  </div>
+</div>
+
+<!-- MODAL HORA (edit/delete) -->
+<div class="mo" id="mHora">
+  <div class="md" style="width:min(440px,95vw)">
+    <div class="mh"><h3 id="mHoraTitle">Editar Hor&#225;rio</h3><button class="mc" onclick="closeHora()">&#215;</button></div>
+    <div class="mb">
+      <div class="fg"><label>Hora (ex: 17H30)</label><input type="text" id="nHora"></div>
+      <div id="mHoraInfo" style="margin-top:.75rem;font-size:.78rem;color:var(--g4)"></div>
+    </div>
+    <div class="mf">
+      <button class="btn br" id="btnDelHora" onclick="deleteHora()" style="margin-right:auto;display:none">&#128465; Eliminar</button>
+      <button class="btn bo" onclick="closeHora()">Cancelar</button>
+      <button class="btn bp" onclick="saveHora()">&#128190; Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast">OK</div>
+
+<script>
+// ═══ CONFIG ═══
+var POOLS = [
+  {id:'felgueiras',name:'Piscina Municipal de Felgueiras'},
+  {id:'lixa',name:'Piscina Municipal da Lixa'},
+  {id:'idaes',name:'Piscina Municipal de Idães'}
+];
+var DAYS = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
+var DAYS_SHORT = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+var NVL = [
+  {id:'3c',lb:'3C',full:'Nível 3C',cl:'l3c',tc:'t3c'},
+  {id:'2a',lb:'2A',full:'Nível 2A',cl:'l2a',tc:'t2a'},
+  {id:'2c',lb:'2C',full:'Nível 2C',cl:'l2c',tc:'t2c'},
+  {id:'1a',lb:'1A',full:'Nível 1A',cl:'l1a',tc:'t1a'},
+  {id:'1c',lb:'1C',full:'Nível 1C',cl:'l1c',tc:'t1c'},
+  {id:'ini',lb:'Ini',full:'Iniciação',cl:'lin',tc:'tin'},
+  {id:'beb',lb:'Beb',full:'Bebés',cl:'lbe',tc:'tbe'},
+  {id:'hid',lb:'Hid',full:'Hidroginástica',cl:'lhi',tc:'thi'}
+];
+var BASE_YEARS = [2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035];
+
+// ═══ STATE ═══
+var curPool = 'felgueiras';
+var curEp = 0;
+var DB = {};
+var faltas = {};
+var subs = {};
+var tmpSubs = {};
+var curSubSlot = null;
+var editProfId = null;
+var editHoraCtx = null;  // {type:'week'|'sat'|'sun', idx:N, orig:'17H30'} or null for new
+
+function dbKey() { return curPool + '_' + BASE_YEARS[curEp]; }
+
+function getData() {
+  var k = dbKey();
+  if (!DB[k]) DB[k] = {professors:[], schedule:{}, weekHoras:[], satHoras:[], sunHoras:[]};
+  var d = DB[k];
+  // Migration: old format had `horas` field
+  if (d.horas && !d.weekHoras.length) { d.weekHoras = d.horas.slice(); delete d.horas; }
+  if (!d.weekHoras) d.weekHoras = [];
+  if (!d.satHoras) d.satHoras = [];
+  if (!d.sunHoras) d.sunHoras = [];
+  if (!d.professors) d.professors = [];
+  if (!d.schedule) d.schedule = {};
+  return d;
+}
+
+function getProf(id) {
+  var d = getData();
+  for (var i=0; i<d.professors.length; i++) if (d.professors[i].id===id) return d.professors[i];
+  return null;
+}
+function pName(id) { var p = getProf(id); return p ? (p.abrev||p.nome) : '—'; }
+function nLevel(id) { for (var i=0;i<NVL.length;i++) if (NVL[i].id===id) return NVL[i]; return NVL[5]; }
+function fKey(profId) { return dbKey() + '__' + profId; }
+function getFaltas(profId) { return faltas[fKey(profId)] || []; }
+function countAulas(profId) {
+  var d = getData(), c = 0;
+  var all = d.weekHoras.concat(d.satHoras, d.sunHoras);
+  for (var i=0;i<all.length;i++) {
+    var h = all[i];
+    if (!d.schedule[h]) continue;
+    for (var di=0;di<7;di++) {
+      var sl = d.schedule[h][di] || [];
+      for (var k=0;k<sl.length;k++) if (sl[k].profId===profId) c++;
+    }
+  }
+  return c;
+}
+
+// ═══ ÉPOCA ═══
+function changeEpoca(dir) {
+  curEp = Math.max(0, Math.min(BASE_YEARS.length-1, curEp+dir));
+  document.getElementById('epLabel').textContent = BASE_YEARS[curEp]+'/'+(BASE_YEARS[curEp]+1);
+  // seed new epoca if needed
+  ensureEpocaSeeded();
+  refresh();
+}
+
+function ensureEpocaSeeded() {
+  // If this pool+epoca has no data, copy professors from felgueiras_2025 (or current pool's 2025) as a starter
+  var k = dbKey();
+  if (!DB[k] || (!DB[k].professors || !DB[k].professors.length)) {
+    // Use whatever profs were seeded for 2025 of this pool
+    var src = DB[curPool + '_2025'];
+    if (src) {
+      DB[k] = {
+        professors: JSON.parse(JSON.stringify(src.professors)),
+        schedule: {},
+        weekHoras: src.weekHoras ? src.weekHoras.slice() : [],
+        satHoras: src.satHoras ? src.satHoras.slice() : [],
+        sunHoras: src.sunHoras ? src.sunHoras.slice() : []
+      };
+    }
+  }
+}
+
+// ═══ POOL ═══
+function openPoolModal() {
+  var opts = document.getElementById('poolOpts');
+  var html = '';
+  for (var i=0;i<POOLS.length;i++) {
+    var p = POOLS[i];
+    html += '<div class="po' + (p.id===curPool ? ' active' : '') + '" data-pool="' + p.id + '">';
+    html += '<span style="font-size:1.5rem">&#x1F3CA;</span>';
+    html += '<div><h4>' + p.name + '</h4></div>';
+    html += '</div>';
+  }
+  opts.innerHTML = html;
+  // Attach handlers after innerHTML (avoids escape issues completely)
+  var nodes = opts.querySelectorAll('.po');
+  for (var i=0;i<nodes.length;i++) {
+    (function(n){
+      n.onclick = function(){ selectPool(n.getAttribute('data-pool')); };
+    })(nodes[i]);
+  }
+  document.getElementById('mPool').classList.add('open');
+}
+function closePool() { document.getElementById('mPool').classList.remove('open'); }
+function selectPool(id) {
+  curPool = id;
+  var p = null;
+  for (var i=0;i<POOLS.length;i++) if (POOLS[i].id===id) p = POOLS[i];
+  if (p) document.getElementById('pname').textContent = p.name;
+  closePool();
+  ensureEpocaSeeded();
+  refresh();
+  toast('🏊 ' + (p ? p.name : id));
+}
+
+// ═══ TABS ═══
+function showTab(id, el) {
+  var tabs = document.querySelectorAll('.tab');
+  for (var i=0;i<tabs.length;i++) tabs[i].classList.remove('active');
+  var nis = document.querySelectorAll('.ni');
+  for (var i=0;i<nis.length;i++) nis[i].classList.remove('active');
+  document.getElementById(id).classList.add('active');
+  if (el) el.classList.add('active');
+  if (id==='t0') renderDash();
+  if (id==='t3') { fillSelects(); renderIndiv(); }
+  if (id==='t4') fillSelects();
+  if (id==='t5') fillSelects();
+}
+
+// ═══ SCHEDULE ═══
+function renderSchedule() {
+  var d = getData();
+  var tb = document.getElementById('sBody');
+  tb.innerHTML = '';
+  var nRows = Math.max(d.weekHoras.length, d.satHoras.length, d.sunHoras.length, 1);
+
+  for (var r=0; r<nRows; r++) {
+    var tr = document.createElement('tr');
+
+    // Col 1: weekday hour
+    var wh = d.weekHoras[r];
+    var thW = document.createElement('td');
+    thW.className = 'ch' + (wh ? '' : ' empty');
+    thW.textContent = wh || '—';
+    if (wh) (function(idx,hora){ thW.onclick = function(){ openHoraEdit('week', idx, hora); }; })(r, wh);
+    tr.appendChild(thW);
+
+    // Cols 2-6: Mon-Fri
+    for (var di=0; di<5; di++) {
+      tr.appendChild(makeDayCell(wh, di));
+    }
+
+    // Col 7: Saturday hour
+    var sh = d.satHoras[r];
+    var thS = document.createElement('td');
+    thS.className = 'ch sat' + (sh ? '' : ' empty');
+    thS.textContent = sh || '—';
+    if (sh) (function(idx,hora){ thS.onclick = function(){ openHoraEdit('sat', idx, hora); }; })(r, sh);
+    tr.appendChild(thS);
+
+    // Col 8: Sat
+    tr.appendChild(makeDayCell(sh, 5));
+
+    // Col 9: Sunday hour
+    var dh = d.sunHoras[r];
+    var thD = document.createElement('td');
+    thD.className = 'ch sun' + (dh ? '' : ' empty');
+    thD.textContent = dh || '—';
+    if (dh) (function(idx,hora){ thD.onclick = function(){ openHoraEdit('sun', idx, hora); }; })(r, dh);
+    tr.appendChild(thD);
+
+    // Col 10: Sun
+    tr.appendChild(makeDayCell(dh, 6));
+
+    tb.appendChild(tr);
+  }
+}
+
+function makeDayCell(hora, dayIdx) {
+  var td = document.createElement('td');
+  if (!hora) { td.className = 'dc empty'; return td; }
+  td.className = 'dc';
+  var d = getData();
+  var slots = ((d.schedule[hora]||{})[dayIdx]) || [];
+  var wrap = document.createElement('div');
+  for (var i=0;i<slots.length;i++) wrap.appendChild(makeSlot(hora, dayIdx, i, slots[i]));
+  var ab = document.createElement('button');
+  ab.className = 'as'; ab.textContent = '+ nível';
+  (function(hh, dd){ ab.onclick = function(){ addSlot(hh, dd); }; })(hora, dayIdx);
+  wrap.appendChild(ab); td.appendChild(wrap);
+  return td;
+}
+
+function makeSlot(h, di, si, slot) {
+  var nv = nLevel(slot.nivel);
+  var d = getData();
+  var div = document.createElement('div'); div.className = 'sl ' + nv.cl;
+  var tag = document.createElement('span'); tag.className = 'nt ' + nv.tc; tag.textContent = nv.lb; div.appendChild(tag);
+  var ps = document.createElement('select');
+  var optH = '<option value="">Prof...</option>';
+  for (var i=0;i<d.professors.length;i++) {
+    var pr = d.professors[i];
+    optH += '<option value="' + pr.id + '"' + (slot.profId===pr.id?' selected':'') + '>' + (pr.abrev||pr.nome) + '</option>';
+  }
+  ps.innerHTML = optH;
+  (function(hh,dd,ss){
+    ps.onchange = function() {
+      var dx = getData();
+      if (!dx.schedule[hh]) dx.schedule[hh] = {};
+      if (!dx.schedule[hh][dd]) dx.schedule[hh][dd] = [];
+      dx.schedule[hh][dd][ss].profId = ps.value;
+    };
+  })(h, di, si);
+  div.appendChild(ps);
+  var ns = document.createElement('select');
+  ns.style.cssText = 'font-size:.68rem;padding:.15rem;border-radius:3px;border:1px solid #ccc;max-width:80px';
+  var nOpt = '';
+  for (var i=0;i<NVL.length;i++) nOpt += '<option value="' + NVL[i].id + '"' + (slot.nivel===NVL[i].id?' selected':'') + '>' + NVL[i].full + '</option>';
+  ns.innerHTML = nOpt;
+  (function(hh,dd,ss){ ns.onchange = function(){ getData().schedule[hh][dd][ss].nivel = ns.value; renderSchedule(); }; })(h, di, si);
+  div.appendChild(ns);
+  var rm = document.createElement('button'); rm.className = 'rs'; rm.innerHTML = '&times;';
+  (function(hh,dd,ss){ rm.onclick = function(){ getData().schedule[hh][dd].splice(ss,1); renderSchedule(); }; })(h, di, si);
+  div.appendChild(rm);
+  return div;
+}
+
+function addSlot(h, di) {
+  var d = getData();
+  if (!d.schedule[h]) d.schedule[h] = {};
+  if (!d.schedule[h][di]) d.schedule[h][di] = [];
+  d.schedule[h][di].push({nivel:'ini', profId:''});
+  renderSchedule();
+}
+
+// ═══ HORA EDIT/ADD MODAL ═══
+function addHorario(type) {
+  editHoraCtx = {type:type, idx:-1, orig:null};
+  document.getElementById('mHoraTitle').textContent = 'Adicionar Horário (' + horaTypeLabel(type) + ')';
+  document.getElementById('nHora').value = '';
+  document.getElementById('mHoraInfo').textContent = '';
+  document.getElementById('btnDelHora').style.display = 'none';
+  document.getElementById('mHora').classList.add('open');
+}
+function openHoraEdit(type, idx, orig) {
+  editHoraCtx = {type:type, idx:idx, orig:orig};
+  document.getElementById('mHoraTitle').textContent = 'Editar Horário (' + horaTypeLabel(type) + ')';
+  document.getElementById('nHora').value = orig;
+  var d = getData();
+  var slots = d.schedule[orig] || {};
+  var count = 0;
+  if (type==='week') { for (var di=0;di<5;di++) count += (slots[di]||[]).length; }
+  else if (type==='sat') count += (slots[5]||[]).length;
+  else count += (slots[6]||[]).length;
+  document.getElementById('mHoraInfo').textContent = count > 0
+    ? '⚠ Este horário tem ' + count + ' aula(s) associada(s). Eliminar irá remover essas aulas.'
+    : 'Sem aulas associadas.';
+  document.getElementById('btnDelHora').style.display = 'inline-flex';
+  document.getElementById('mHora').classList.add('open');
+}
+function horaTypeLabel(t) { return t==='week' ? 'Semana' : t==='sat' ? 'Sábado' : 'Domingo'; }
+function closeHora() { document.getElementById('mHora').classList.remove('open'); editHoraCtx = null; }
+function saveHora() {
+  var newH = document.getElementById('nHora').value.trim().toUpperCase();
+  if (!newH) { alert('Hora vazia!'); return; }
+  if (!editHoraCtx) return;
+  var d = getData();
+  var arr = editHoraCtx.type==='week' ? d.weekHoras : editHoraCtx.type==='sat' ? d.satHoras : d.sunHoras;
+  if (editHoraCtx.idx === -1) {
+    // Add new
+    if (arr.indexOf(newH) === -1) {
+      arr.push(newH); arr.sort();
+    }
+  } else {
+    // Edit existing
+    var orig = editHoraCtx.orig;
+    if (newH !== orig) {
+      // Rename: move schedule data from orig key to newH key
+      if (d.schedule[orig]) {
+        if (!d.schedule[newH]) d.schedule[newH] = {};
+        // Only move the slots for the relevant days
+        var dayRange = editHoraCtx.type==='week' ? [0,1,2,3,4] : editHoraCtx.type==='sat' ? [5] : [6];
+        for (var i=0;i<dayRange.length;i++) {
+          var dd = dayRange[i];
+          if (d.schedule[orig][dd]) {
+            d.schedule[newH][dd] = d.schedule[orig][dd];
+            delete d.schedule[orig][dd];
+          }
+        }
+        // Clean up empty
+        if (Object.keys(d.schedule[orig]).length === 0) delete d.schedule[orig];
+      }
+      var i = arr.indexOf(orig);
+      if (i !== -1) arr[i] = newH;
+      arr.sort();
+    }
+  }
+  closeHora(); renderSchedule(); toast('💾 Horário guardado');
+}
+function deleteHora() {
+  if (!editHoraCtx || editHoraCtx.idx === -1) return;
+  if (!confirm('Eliminar este horário e todas as aulas associadas?')) return;
+  var d = getData();
+  var arr = editHoraCtx.type==='week' ? d.weekHoras : editHoraCtx.type==='sat' ? d.satHoras : d.sunHoras;
+  var orig = editHoraCtx.orig;
+  var i = arr.indexOf(orig);
+  if (i !== -1) arr.splice(i, 1);
+  // Remove schedule entries for relevant days
+  if (d.schedule[orig]) {
+    var dayRange = editHoraCtx.type==='week' ? [0,1,2,3,4] : editHoraCtx.type==='sat' ? [5] : [6];
+    for (var j=0;j<dayRange.length;j++) delete d.schedule[orig][dayRange[j]];
+    if (Object.keys(d.schedule[orig]).length === 0) delete d.schedule[orig];
+  }
+  closeHora(); renderSchedule(); toast('🗑 Horário eliminado');
+}
+
+// ═══ PROFESSORS ═══
+function openProfModal(id) {
+  editProfId = id;
+  document.getElementById('mProfTitle').textContent = id ? 'Editar Professor' : 'Adicionar Professor';
+  var fields = ['pNome','pAbrev','pTel','pEmail','eExtra','dExtra','pObs'];
+  for (var i=0;i<fields.length;i++) document.getElementById(fields[i]).value = '';
+  var cks = document.querySelectorAll('[id^=e-]');
+  for (var i=0;i<cks.length;i++) cks[i].checked = false;
+  var rds = document.querySelectorAll('[name=dp]');
+  for (var i=0;i<rds.length;i++) rds[i].checked = false;
+  if (id) {
+    var p = getProf(id);
+    if (p) {
+      document.getElementById('pNome').value = p.nome || '';
+      document.getElementById('pAbrev').value = p.abrev || '';
+      document.getElementById('pTel').value = p.tel || '';
+      document.getElementById('pEmail').value = p.email || '';
+      document.getElementById('eExtra').value = p.espExtra || '';
+      document.getElementById('dExtra').value = p.dispExtra || '';
+      document.getElementById('pObs').value = p.obs || '';
+      var esps = p.especialidades || [];
+      for (var i=0;i<esps.length;i++) {
+        var el = document.querySelector('[id^=e-][value="' + esps[i].replace(/"/g,'\\"') + '"]');
+        if (el) el.checked = true;
+      }
+      if (p.disponibilidade) {
+        var r = document.querySelector('[name=dp][value="' + p.disponibilidade.replace(/"/g,'\\"') + '"]');
+        if (r) r.checked = true;
+      }
+    }
+  }
+  document.getElementById('mProf').classList.add('open');
+}
+function closePM() { document.getElementById('mProf').classList.remove('open'); }
+function saveProf() {
+  var nome = document.getElementById('pNome').value.trim();
+  if (!nome) { alert('Nome é obrigatório!'); return; }
+  var esps = [];
+  var checked = document.querySelectorAll('[id^=e-]:checked');
+  for (var i=0;i<checked.length;i++) esps.push(checked[i].value);
+  var disp = '';
+  var dr = document.querySelector('[name=dp]:checked');
+  if (dr) disp = dr.value;
+  var prof = {
+    id: editProfId || String(Date.now()),
+    nome: nome,
+    abrev: document.getElementById('pAbrev').value.trim().toUpperCase() || nome.split(' ')[0].toUpperCase(),
+    tel: document.getElementById('pTel').value.trim(),
+    email: document.getElementById('pEmail').value.trim(),
+    especialidades: esps,
+    espExtra: document.getElementById('eExtra').value.trim(),
+    disponibilidade: disp,
+    dispExtra: document.getElementById('dExtra').value.trim(),
+    obs: document.getElementById('pObs').value.trim(),
+    color: editProfId && getProf(editProfId) ? getProf(editProfId).color : 'hsl(' + Math.floor(Math.random()*360) + ',55%,45%)'
+  };
+  var d = getData();
+  if (editProfId) {
+    for (var i=0;i<d.professors.length;i++) if (d.professors[i].id===editProfId) { d.professors[i] = prof; break; }
+  } else {
+    d.professors.push(prof);
+  }
+  closePM(); renderProfGrid(); fillSelects(); renderSchedule(); renderDash();
+  toast('👤 Professor guardado!');
+}
+function deleteProf(id) {
+  if (!confirm('Eliminar este professor?')) return;
+  var d = getData();
+  var newList = [];
+  for (var i=0;i<d.professors.length;i++) if (d.professors[i].id!==id) newList.push(d.professors[i]);
+  d.professors = newList;
+  renderProfGrid(); fillSelects(); renderSchedule();
+}
+
+function renderProfGrid() {
+  var d = getData();
+  var g = document.getElementById('pGrid');
+  if (!d.professors.length) {
+    g.innerHTML = '<div style="color:var(--g4);padding:2rem;text-align:center;grid-column:1/-1">Sem professores.</div>';
+    return;
+  }
+  g.innerHTML = '';
+  for (var i=0;i<d.professors.length;i++) {
+    var p = d.professors[i];
+    var nameParts = p.nome.split(' ');
+    var init = (nameParts[0]?nameParts[0][0]:'') + (nameParts[1]?nameParts[1][0]:'');
+    init = init.toUpperCase();
+    var esps = (p.especialidades || []).slice();
+    if (p.espExtra) esps.push(p.espExtra);
+    var aulas = countAulas(p.id);
+    var card = document.createElement('div');
+    card.className = 'pc';
+    card.innerHTML =
+      '<div class="pch">' +
+        '<div class="pca" style="background:' + (p.color||'var(--bp)') + '">' + init + '</div>' +
+        '<div><div style="font-weight:700">' + escapeHTML(p.nome) + '</div>' +
+        '<div style="font-size:.75rem;color:var(--g4)">' + escapeHTML(p.disponibilidade||'—') + '</div></div>' +
+        '<div style="margin-left:auto;text-align:center">' +
+          '<div style="font-size:1.3rem;font-weight:700;color:var(--bp)">' + aulas + '</div>' +
+          '<div style="font-size:.7rem;color:var(--g4)">aulas/sem</div></div>' +
+      '</div>' +
+      '<div class="pcb">' +
+        (p.tel ? '<div class="pir">📞 <span>' + escapeHTML(p.tel) + '</span></div>' : '') +
+        (p.email ? '<div class="pir">✉️ <span>' + escapeHTML(p.email) + '</span></div>' : '') +
+        (p.obs ? '<div class="pir">📝 ' + escapeHTML(p.obs) + '</div>' : '') +
+        '<div class="pts">' + (esps.length ? esps.map(function(e){return '<span class="pt">' + escapeHTML(e) + '</span>';}).join('') : '<span style="color:var(--g4);font-size:.78rem">Sem especialidades</span>') + '</div>' +
+      '</div>' +
+      '<div class="pcf">' +
+        '<button class="btn bo bsm" data-act="edit">✏️ Editar</button>' +
+        '<button class="btn br bsm" data-act="del">🗑</button>' +
+        '<button class="btn bsm" style="background:var(--aql);color:var(--bd)" data-act="view">📅 Horário</button>' +
+      '</div>';
+    // Attach handlers (avoids onclick escape issues)
+    (function(pid, cardEl) {
+      cardEl.querySelector('[data-act=edit]').onclick = function() { openProfModal(pid); };
+      cardEl.querySelector('[data-act=del]').onclick = function() { deleteProf(pid); };
+      cardEl.querySelector('[data-act=view]').onclick = function() { viewHS(pid); };
+    })(p.id, card);
+    g.appendChild(card);
+  }
+}
+
+function escapeHTML(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function viewHS(profId) {
+  document.getElementById('ps3').value = profId;
+  var nis = document.querySelectorAll('.ni');
+  showTab('t3', nis[3]);
+  renderIndiv();
+}
+
+// ═══ SELECTS ═══
+function fillSelects() {
+  var d = getData();
+  var opts = '<option value="">— Escolher —</option>';
+  for (var i=0;i<d.professors.length;i++) {
+    opts += '<option value="' + d.professors[i].id + '">' + escapeHTML(d.professors[i].nome) + '</option>';
+  }
+  var ids = ['ps3','psF','psSub'];
+  for (var i=0;i<ids.length;i++) {
+    var el = document.getElementById(ids[i]);
+    if (!el) continue;
+    var v = el.value;
+    el.innerHTML = opts;
+    el.value = v;
+  }
+}
+
+// ═══ INDIV ═══
+function renderIndiv() {
+  var profId = document.getElementById('ps3').value;
+  var w = document.getElementById('indivWrap');
+  if (!profId) { w.style.display = 'none'; return; }
+  w.style.display = 'block';
+  var p = getProf(profId);
+  var d = getData();
+  document.getElementById('indivTitle').textContent = '📅 Horário: ' + (p?p.nome:'');
+  var body = document.getElementById('indivBody');
+  body.innerHTML = '';
+  // Build unified hour list across week/sat/sun
+  var allHours = [];
+  for (var i=0;i<d.weekHoras.length;i++) {
+    var h = d.weekHoras[i];
+    if (hasProfAt(h, [0,1,2,3,4], profId)) allHours.push({h:h, days:[0,1,2,3,4]});
+  }
+  for (var i=0;i<d.satHoras.length;i++) {
+    var h = d.satHoras[i];
+    if (hasProfAt(h, [5], profId)) allHours.push({h:h, days:[5]});
+  }
+  for (var i=0;i<d.sunHoras.length;i++) {
+    var h = d.sunHoras[i];
+    if (hasProfAt(h, [6], profId)) allHours.push({h:h, days:[6]});
+  }
+  if (!allHours.length) {
+    body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--g4);padding:2rem">Sem aulas atribuídas.</td></tr>';
+    return;
+  }
+  for (var r=0;r<allHours.length;r++) {
+    var entry = allHours[r];
+    var tr = document.createElement('tr');
+    var tdh = document.createElement('td'); tdh.className = 'hc'; tdh.textContent = entry.h; tr.appendChild(tdh);
+    for (var di=0;di<7;di++) {
+      var td = document.createElement('td');
+      if (entry.days.indexOf(di) !== -1) {
+        var slots = ((d.schedule[entry.h]||{})[di]||[]).filter(function(s){return s.profId===profId;});
+        if (slots.length) {
+          var fl = getFaltas(profId);
+          var html = '';
+          for (var s=0;s<slots.length;s++) {
+            var nv = nLevel(slots[s].nivel);
+            var isF = false;
+            for (var f=0;f<fl.length;f++) if (fl[f].hora===entry.h && fl[f].dayIdx===di && fl[f].nivel===slots[s].nivel) { isF = true; break; }
+            html += '<span class="ia" style="' + (isF?'background:#ffcdd2;color:#c62828;':'') + '">' + nv.full + '</span>';
+            if (s < slots.length-1) html += '<br>';
+          }
+          td.innerHTML = html;
+        }
+      } else {
+        td.style.background = 'var(--g1)';
+      }
+      tr.appendChild(td);
+    }
+    body.appendChild(tr);
+  }
+}
+function hasProfAt(h, dayList, profId) {
+  var d = getData();
+  if (!d.schedule[h]) return false;
+  for (var i=0;i<dayList.length;i++) {
+    var sl = d.schedule[h][dayList[i]] || [];
+    for (var j=0;j<sl.length;j++) if (sl[j].profId===profId) return true;
+  }
+  return false;
+}
+
+// ═══ FALTAS ═══
+function renderFaltas() {
+  var profId = document.getElementById('psF').value;
+  var w = document.getElementById('fWrap');
+  if (!profId) { w.style.display = 'none'; return; }
+  w.style.display = 'block';
+  var d = getData();
+  var fl = document.getElementById('fList');
+  fl.innerHTML = '';
+  var has = false;
+  var allEntries = [];
+  for (var i=0;i<d.weekHoras.length;i++) for (var di=0;di<5;di++) allEntries.push({h:d.weekHoras[i], di:di});
+  for (var i=0;i<d.satHoras.length;i++) allEntries.push({h:d.satHoras[i], di:5});
+  for (var i=0;i<d.sunHoras.length;i++) allEntries.push({h:d.sunHoras[i], di:6});
+  for (var i=0;i<allEntries.length;i++) {
+    var h = allEntries[i].h, di = allEntries[i].di;
+    var slots = ((d.schedule[h]||{})[di]||[]).filter(function(s){return s.profId===profId;});
+    for (var s=0;s<slots.length;s++) {
+      has = true;
+      var sl = slots[s];
+      var nv = nLevel(sl.nivel);
+      var k = h + '-' + di + '-' + sl.nivel;
+      var isSel = false;
+      var existing = getFaltas(profId);
+      for (var e=0;e<existing.length;e++) if (existing[e].key===k) { isSel = true; break; }
+      var div = document.createElement('div');
+      div.className = 'fs' + (isSel ? ' sel' : '');
+      var cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'fc'; if (isSel) cb.checked = true;
+      (function(hh, dd, nl, kk, dvv, cbb) {
+        cbb.onchange = function() { toggleFalta(profId, kk, hh, dd, nl, cbb.checked, dvv); };
+        dvv.onclick = function(e) { if (e.target.tagName==='INPUT') return; cbb.checked = !cbb.checked; toggleFalta(profId, kk, hh, dd, nl, cbb.checked, dvv); };
+      })(h, di, sl.nivel, k, div, cb);
+      var lbl = document.createElement('span'); lbl.className = 'fl';
+      lbl.innerHTML = '<strong>' + h + '</strong> — ' + DAYS[di] + ' — <span style="font-weight:600;color:var(--bp)">' + nv.full + '</span>';
+      div.appendChild(cb); div.appendChild(lbl); fl.appendChild(div);
+    }
+  }
+  if (!has) fl.innerHTML = '<div style="color:var(--g4);padding:1rem;text-align:center">Sem aulas atribuídas.</div>';
+  renderFSumm(profId);
+}
+function toggleFalta(profId, k, h, di, nivel, add, el) {
+  var fk = fKey(profId);
+  if (!faltas[fk]) faltas[fk] = [];
+  if (add) {
+    var exists = false;
+    for (var i=0;i<faltas[fk].length;i++) if (faltas[fk][i].key===k) { exists = true; break; }
+    if (!exists) faltas[fk].push({key:k, hora:h, dayIdx:di, nivel:nivel});
+  } else {
+    var newList = [];
+    for (var i=0;i<faltas[fk].length;i++) if (faltas[fk][i].key!==k) newList.push(faltas[fk][i]);
+    faltas[fk] = newList;
+  }
+  el.classList.toggle('sel', add);
+  renderFSumm(profId);
+}
+function renderFSumm(profId) {
+  var p = getProf(profId);
+  var fl = getFaltas(profId);
+  var el = document.getElementById('fSumm');
+  if (!fl.length) { el.innerHTML = '<div style="color:var(--g4);font-size:.85rem">Selecione aulas.</div>'; return; }
+  var html = '<h4>📄 Faltas — ' + escapeHTML(p?p.nome:'') + '</h4>';
+  html += '<div style="font-size:.78rem;color:var(--g4);margin-bottom:.75rem">' + new Date().toLocaleDateString('pt-PT') + '</div>';
+  for (var i=0;i<fl.length;i++) {
+    var nv = nLevel(fl[i].nivel);
+    html += '<div class="fi"><span>' + fl[i].hora + ' — ' + DAYS[fl[i].dayIdx] + '</span><span style="font-weight:600">' + nv.full + '</span></div>';
+  }
+  html += '<div style="margin-top:1rem;font-size:.78rem;color:var(--g4)">Total: ' + fl.length + ' aula(s)</div>';
+  el.innerHTML = html;
+}
+function clearFaltas() {
+  var profId = document.getElementById('psF').value;
+  if (profId) faltas[fKey(profId)] = [];
+  renderFaltas();
+}
+
+// ═══ SUBSTITUIÇÕES ═══
+function renderSub() {
+  var profId = document.getElementById('psSub').value;
+  var w = document.getElementById('subWrap');
+  if (!profId) { w.style.display = 'none'; return; }
+  w.style.display = 'block';
+  var fl = getFaltas(profId);
+  var sl = document.getElementById('subList');
+  if (!fl.length) {
+    sl.innerHTML = '<div style="color:var(--g4);padding:1rem">Sem faltas. Use o separador Faltas.</div>';
+    document.getElementById('subAvail').innerHTML = '';
+    return;
+  }
+  sl.innerHTML = '';
+  for (var i=0;i<fl.length;i++) {
+    var f = fl[i];
+    var nv = nLevel(f.nivel);
+    var subId = tmpSubs[f.key] || subs[f.key];
+    var sn = subId ? pName(subId) : '';
+    var div = document.createElement('div');
+    div.className = 'fs' + (curSubSlot===f.key ? ' sel' : '');
+    div.innerHTML = '<div class="fl"><strong>' + f.hora + '</strong> — ' + DAYS[f.dayIdx] + '<br><span style="font-size:.75rem;color:var(--bp)">' + nv.full + '</span></div>' +
+      (subId ? '<span style="background:#e8f5e9;color:#2e7d32;border-radius:4px;padding:.15rem .5rem;font-size:.75rem;font-weight:600">✓ ' + escapeHTML(sn) + '</span>'
+             : '<span style="font-size:.75rem;color:var(--rd)">Sem substituto</span>');
+    (function(fk){ div.onclick = function(){ curSubSlot = fk; renderSub(); }; })(f.key);
+    sl.appendChild(div);
+  }
+  renderAvail(profId);
+  renderSubMapa(profId);
+}
+function renderAvail(absId) {
+  var av = document.getElementById('subAvail');
+  if (!curSubSlot) { av.innerHTML = '<div style="color:var(--g4);font-size:.85rem">Selecione uma aula.</div>'; return; }
+  var fl = getFaltas(absId);
+  var f = null;
+  for (var i=0;i<fl.length;i++) if (fl[i].key===curSubSlot) { f = fl[i]; break; }
+  if (!f) return;
+  var d = getData();
+  var busy = {};
+  var slots = ((d.schedule[f.hora]||{})[f.dayIdx]) || [];
+  for (var i=0;i<slots.length;i++) if (slots[i].profId) busy[slots[i].profId] = true;
+  var avail = [];
+  for (var i=0;i<d.professors.length;i++) {
+    var p = d.professors[i];
+    if (p.id !== absId && !busy[p.id]) avail.push(p);
+  }
+  var nv = nLevel(f.nivel);
+  var html = '<div style="font-size:.8rem;color:var(--g7);margin-bottom:.75rem">Aula: <strong>' + f.hora + ' — ' + DAYS[f.dayIdx] + ' — ' + nv.full + '</strong></div>';
+  if (!avail.length) {
+    html += '<div style="color:var(--rd);font-size:.85rem">Sem professores disponíveis.</div>';
+  } else {
+    av.innerHTML = html;
+    for (var i=0;i<avail.length;i++) {
+      var p = avail[i];
+      var isS = tmpSubs[f.key] === p.id;
+      var card = document.createElement('div');
+      card.className = 'sac';
+      card.innerHTML = '<div><div style="font-weight:600">' + escapeHTML(p.nome) + '</div><div style="font-size:.75rem;color:var(--g4)">' + escapeHTML((p.especialidades||[]).join(', ')) + '</div></div>' +
+        '<button class="btn bsm ' + (isS?'bs':'bo') + '">' + (isS ? '✓ Escolhido' : 'Escolher') + '</button>';
+      (function(fk, pid){ card.querySelector('button').onclick = function(){ assignSub(fk, pid); }; })(f.key, p.id);
+      av.appendChild(card);
+    }
+    return;
+  }
+  av.innerHTML = html;
+}
+function assignSub(k, profId) {
+  if (tmpSubs[k] === profId) delete tmpSubs[k];
+  else tmpSubs[k] = profId;
+  renderSub();
+}
+function confirmarSub() {
+  for (var k in tmpSubs) subs[k] = tmpSubs[k];
+  tmpSubs = {};
+  renderSub();
+  toast('✓ Substituições confirmadas!');
+}
+function renderSubMapa(absId) {
+  var w = document.getElementById('subMapa');
+  var fl = getFaltas(absId);
+  if (!fl.length) { w.innerHTML = '<div style="color:var(--g4);padding:1rem">Confirme substituições.</div>'; return; }
+  var d = getData();
+  var allSubs = {};
+  for (var k in subs) allSubs[k] = subs[k];
+  for (var k in tmpSubs) allSubs[k] = tmpSubs[k];
+  var rh = [];
+  var allH = d.weekHoras.concat(d.satHoras, d.sunHoras);
+  for (var i=0;i<allH.length;i++) {
+    var matches = false;
+    for (var j=0;j<fl.length;j++) if (fl[j].hora===allH[i]) { matches = true; break; }
+    if (matches && rh.indexOf(allH[i]) === -1) rh.push(allH[i]);
+  }
+  var html = '<table class="sg" style="min-width:700px;font-size:.76rem"><thead><tr><th>Hora</th>';
+  for (var i=0;i<DAYS.length;i++) html += '<th>' + DAYS[i] + '</th>';
+  html += '</tr></thead><tbody>';
+  for (var r=0;r<rh.length;r++) {
+    var h = rh[r];
+    html += '<tr><td class="ch">' + h + '</td>';
+    for (var di=0;di<7;di++) {
+      var falta = null;
+      for (var j=0;j<fl.length;j++) if (fl[j].hora===h && fl[j].dayIdx===di) { falta = fl[j]; break; }
+      if (falta) {
+        var subId = allSubs[falta.key];
+        var nv = nLevel(falta.nivel);
+        if (subId) {
+          var sp = getProf(subId);
+          html += '<td class="dc" style="background:#e8f5e9"><div class="sl l2a"><span class="nt t2a">' + nv.lb + '</span><span style="font-size:.72rem;font-weight:600;color:#2e7d32">↔ ' + (sp?sp.abrev:'?') + '</span></div></td>';
+        } else {
+          html += '<td class="dc" style="background:#ffebee"><div class="sl" style="background:#ffcdd2;border-left:3px solid var(--rd)"><span class="nt" style="background:var(--rd)">' + nv.lb + '</span><span style="font-size:.72rem;color:var(--rd)">⚠ Falta</span></div></td>';
+        }
+      } else {
+        var slots = ((d.schedule[h]||{})[di]) || [];
+        var cellHtml = '';
+        for (var s=0;s<slots.length;s++) {
+          var nv = nLevel(slots[s].nivel);
+          cellHtml += '<div class="sl ' + nv.cl + '"><span class="nt ' + nv.tc + '">' + nv.lb + '</span><span style="font-size:.72rem">' + escapeHTML(pName(slots[s].profId)) + '</span></div>';
+        }
+        html += '<td class="dc">' + cellHtml + '</td>';
+      }
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  w.innerHTML = html;
+}
+
+// ═══ DASHBOARD ═══
+function renderDash() {
+  var d = getData();
+  var pool = null;
+  for (var i=0;i<POOLS.length;i++) if (POOLS[i].id===curPool) pool = POOLS[i];
+  var y = BASE_YEARS[curEp];
+  document.getElementById('dPool').innerHTML = '🏊 ' + (pool?pool.name:'') + ' · Época ' + y + '/' + (y+1);
+  var totalA = 0, profsSet = {}, lvlC = {};
+  var allH = d.weekHoras.concat(d.satHoras, d.sunHoras);
+  for (var i=0;i<allH.length;i++) {
+    var h = allH[i];
+    if (!d.schedule[h]) continue;
+    for (var di=0;di<7;di++) {
+      var sl = d.schedule[h][di] || [];
+      for (var k=0;k<sl.length;k++) {
+        totalA++;
+        if (sl[k].profId) profsSet[sl[k].profId] = true;
+        lvlC[sl[k].nivel] = (lvlC[sl[k].nivel]||0) + 1;
+      }
+    }
+  }
+  document.getElementById('dStats').innerHTML =
+    '<div class="dsc"><div class="num">' + totalA + '</div><div class="lbl">Aulas/Sem</div></div>' +
+    '<div class="dsc"><div class="num">' + d.professors.length + '</div><div class="lbl">Professores</div></div>' +
+    '<div class="dsc"><div class="num">' + Object.keys(profsSet).length + '</div><div class="lbl">Com Aulas</div></div>' +
+    '<div class="dsc" style="border-top-color:var(--aq)"><div class="num">' + (d.weekHoras.length + d.satHoras.length + d.sunHoras.length) + '</div><div class="lbl">Horários</div></div>' +
+    '<div class="dsc" style="border-top-color:var(--gn)"><div class="num">' + Object.keys(lvlC).length + '</div><div class="lbl">Níveis</div></div>';
+  var avg = d.professors.length > 0 ? totalA/d.professors.length : 1;
+  var html = '';
+  if (d.professors.length) {
+    for (var i=0;i<d.professors.length;i++) {
+      var p = d.professors[i];
+      var parts = p.nome.split(' ');
+      var init = ((parts[0]?parts[0][0]:'') + (parts[1]?parts[1][0]:'')).toUpperCase();
+      var a = countAulas(p.id);
+      var pct = Math.min(100, Math.round(a/Math.max(1,avg)*100));
+      html += '<div class="pac"><div class="pav" style="background:' + (p.color||'var(--bp)') + '">' + init + '</div>' +
+        '<div style="flex:1"><div style="font-weight:600;font-size:.83rem">' + escapeHTML(p.nome) + '</div>' +
+        '<div style="font-size:.73rem;color:var(--g4);margin-bottom:.3rem">' + a + ' aulas/sem</div>' +
+        '<div style="background:var(--g2);border-radius:3px;height:5px"><div style="background:var(--bp);width:' + pct + '%;height:100%;border-radius:3px"></div></div>' +
+        '</div></div>';
+    }
+  } else {
+    html = '<div style="color:var(--g4);font-size:.85rem">Sem professores.</div>';
+  }
+  document.getElementById('dProfs').innerHTML = html;
+  var lvlHtml = '';
+  for (var id in lvlC) {
+    var nv = nLevel(id);
+    lvlHtml += '<div class="sl ' + nv.cl + '" style="display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .6rem"><span class="nt ' + nv.tc + '">' + nv.lb + '</span><span style="font-weight:700">' + lvlC[id] + ' aulas</span></div>';
+  }
+  document.getElementById('dLvls').innerHTML = lvlHtml || '<div style="color:var(--g4);font-size:.85rem">Sem aulas no mapa.</div>';
+}
+
+// ═══ EXPORTS ═══
+function poolFullName() {
+  for (var i=0;i<POOLS.length;i++) if (POOLS[i].id===curPool) return POOLS[i].name;
+  return curPool;
+}
+function epocaName() { return BASE_YEARS[curEp] + '/' + (BASE_YEARS[curEp]+1); }
+function exportFileBase() { return 'EMN_' + curPool + '_' + BASE_YEARS[curEp]; }
+
+function exportPDF(what) {
+  var title = '', body = '';
+  if (what === 'dash') { title = 'Dashboard'; body = buildDashHTML(); }
+  else if (what === 'mapa') { title = 'Mapa de Distribuição de Turmas'; body = buildMapaHTML(); }
+  else if (what === 'equipa') { title = 'Equipa Técnica'; body = buildEquipaHTML(); }
+  else if (what === 'indiv') {
+    var profId = document.getElementById('ps3').value;
+    if (!profId) { alert('Selecione um professor.'); return; }
+    title = 'Horário Individual — ' + (getProf(profId)?getProf(profId).nome:'');
+    body = buildIndivHTML(profId);
+  }
+  else if (what === 'faltas') {
+    var profId = document.getElementById('psF').value;
+    if (!profId) { alert('Selecione um professor.'); return; }
+    title = 'Registo de Faltas — ' + (getProf(profId)?getProf(profId).nome:'');
+    body = buildFaltasHTML(profId);
+  }
+  else if (what === 'sub') {
+    var profId = document.getElementById('psSub').value;
+    if (!profId) { alert('Selecione um professor.'); return; }
+    title = 'Substituições — ' + (getProf(profId)?getProf(profId).nome:'');
+    body = buildSubHTML(profId);
+  }
+  var win = window.open('', '_blank');
+  win.document.write(
+    '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + escapeHTML(title) + '</title>' +
+    '<style>body{font-family:Arial,sans-serif;padding:1.5rem;color:#1a2332}h1{color:#0a3d6b;margin-bottom:.25rem}h2{color:#1565c0;font-size:1.05rem;margin-top:0;font-weight:500}table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}th{background:#0a3d6b;color:#fff;padding:.5rem;text-align:left}td{padding:.4rem;border:1px solid #ddd}.footer{margin-top:2rem;font-size:.75rem;color:#888;border-top:1px solid #eee;padding-top:.5rem}.sub{font-size:.8rem;color:#666;margin-bottom:1rem}.lvl{display:inline-block;padding:2px 6px;border-radius:3px;font-size:.7rem;font-weight:bold;color:#fff;margin-right:3px}@media print{body{padding:.5rem}}</style>' +
+    '</head><body><h1>Escola Municipal de Natação de Felgueiras</h1>' +
+    '<h2>' + escapeHTML(title) + '</h2>' +
+    '<div class="sub">' + escapeHTML(poolFullName()) + ' · Época ' + epocaName() + ' · Gerado em ' + new Date().toLocaleString('pt-PT') + '</div>' +
+    body +
+    '<div class="footer">Documento gerado automaticamente.</div>' +
+    '<script>window.onload=function(){window.print();}<\/script></body></html>'
+  );
+  win.document.close();
+}
+
+function buildDashHTML() {
+  var d = getData();
+  var totalA = 0, lvlC = {};
+  var allH = d.weekHoras.concat(d.satHoras, d.sunHoras);
+  for (var i=0;i<allH.length;i++) {
+    var h = allH[i]; if (!d.schedule[h]) continue;
+    for (var di=0;di<7;di++) { var sl=d.schedule[h][di]||[]; for (var k=0;k<sl.length;k++){ totalA++; lvlC[sl[k].nivel]=(lvlC[sl[k].nivel]||0)+1; } }
+  }
+  var html = '<h3>Estatísticas Gerais</h3><table><tr><th>Métrica</th><th>Valor</th></tr>';
+  html += '<tr><td>Total de aulas semanais</td><td>' + totalA + '</td></tr>';
+  html += '<tr><td>Professores</td><td>' + d.professors.length + '</td></tr>';
+  html += '<tr><td>Horários distintos</td><td>' + allH.length + '</td></tr>';
+  html += '</table>';
+  html += '<h3>Carga por Professor</h3><table><tr><th>Professor</th><th>Aulas/Sem</th></tr>';
+  for (var i=0;i<d.professors.length;i++) html += '<tr><td>' + escapeHTML(d.professors[i].nome) + '</td><td>' + countAulas(d.professors[i].id) + '</td></tr>';
+  html += '</table>';
+  html += '<h3>Distribuição por Nível</h3><table><tr><th>Nível</th><th>N.º Aulas</th></tr>';
+  for (var id in lvlC) html += '<tr><td>' + nLevel(id).full + '</td><td>' + lvlC[id] + '</td></tr>';
+  html += '</table>';
+  return html;
+}
+
+function buildMapaHTML() {
+  var d = getData();
+  var html = '<h3>Mapa Semanal — Segunda a Sexta</h3>';
+  html += '<table><tr><th>Hora</th>';
+  for (var i=0;i<5;i++) html += '<th>' + DAYS[i] + '</th>';
+  html += '</tr>';
+  for (var r=0;r<d.weekHoras.length;r++) {
+    var h = d.weekHoras[r];
+    html += '<tr><td><strong>' + h + '</strong></td>';
+    for (var di=0;di<5;di++) {
+      var sl = (d.schedule[h]||{})[di] || [];
+      var c = sl.map(function(s){ var nv=nLevel(s.nivel); return '<span class="lvl" style="background:' + lvlColor(nv.id) + '">' + nv.lb + '</span> ' + escapeHTML(pName(s.profId)); }).join('<br>');
+      html += '<td>' + c + '</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  if (d.satHoras.length) {
+    html += '<h3>Sábado</h3><table><tr><th>Hora</th><th>Sábado</th></tr>';
+    for (var r=0;r<d.satHoras.length;r++) {
+      var h = d.satHoras[r];
+      var sl = (d.schedule[h]||{})[5] || [];
+      var c = sl.map(function(s){ var nv=nLevel(s.nivel); return '<span class="lvl" style="background:' + lvlColor(nv.id) + '">' + nv.lb + '</span> ' + escapeHTML(pName(s.profId)); }).join('<br>');
+      html += '<tr><td><strong>' + h + '</strong></td><td>' + c + '</td></tr>';
+    }
+    html += '</table>';
+  }
+  if (d.sunHoras.length) {
+    html += '<h3>Domingo</h3><table><tr><th>Hora</th><th>Domingo</th></tr>';
+    for (var r=0;r<d.sunHoras.length;r++) {
+      var h = d.sunHoras[r];
+      var sl = (d.schedule[h]||{})[6] || [];
+      var c = sl.map(function(s){ var nv=nLevel(s.nivel); return '<span class="lvl" style="background:' + lvlColor(nv.id) + '">' + nv.lb + '</span> ' + escapeHTML(pName(s.profId)); }).join('<br>');
+      html += '<tr><td><strong>' + h + '</strong></td><td>' + c + '</td></tr>';
+    }
+    html += '</table>';
+  }
+  return html;
+}
+function lvlColor(id) {
+  return {'3c':'#0288d1','2a':'#388e3c','2c':'#689f38','1a':'#f9a825','1c':'#e65100','ini':'#c2185b','beb':'#7b1fa2','hid':'#00695c'}[id] || '#666';
+}
+
+function buildEquipaHTML() {
+  var d = getData();
+  var html = '<table><tr><th>Nome</th><th>Telemóvel</th><th>Email</th><th>Especialidades</th><th>Disponibilidade</th><th>Aulas/Sem</th></tr>';
+  for (var i=0;i<d.professors.length;i++) {
+    var p = d.professors[i];
+    var esps = (p.especialidades||[]).join(', ') + (p.espExtra ? (esps?', ':'') + p.espExtra : '');
+    html += '<tr><td>' + escapeHTML(p.nome) + '</td><td>' + escapeHTML(p.tel||'') + '</td><td>' + escapeHTML(p.email||'') + '</td><td>' + escapeHTML(esps) + '</td><td>' + escapeHTML(p.disponibilidade||'') + '</td><td>' + countAulas(p.id) + '</td></tr>';
+  }
+  html += '</table>';
+  return html;
+}
+
+function buildIndivHTML(profId) {
+  var d = getData();
+  var html = '<table><tr><th>Hora</th><th>Dia</th><th>Nível</th></tr>';
+  var allH = d.weekHoras.concat(d.satHoras, d.sunHoras);
+  for (var i=0;i<allH.length;i++) {
+    var h = allH[i];
+    if (!d.schedule[h]) continue;
+    for (var di=0;di<7;di++) {
+      var slots = ((d.schedule[h]||{})[di]||[]).filter(function(s){return s.profId===profId;});
+      for (var s=0;s<slots.length;s++) {
+        html += '<tr><td>' + h + '</td><td>' + DAYS[di] + '</td><td>' + nLevel(slots[s].nivel).full + '</td></tr>';
+      }
+    }
+  }
+  html += '</table>';
+  return html;
+}
+
+function buildFaltasHTML(profId) {
+  var fl = getFaltas(profId);
+  if (!fl.length) return '<p>Sem faltas registadas.</p>';
+  var html = '<table><tr><th>#</th><th>Hora</th><th>Dia</th><th>Nível</th></tr>';
+  for (var i=0;i<fl.length;i++) {
+    html += '<tr><td>' + (i+1) + '</td><td>' + fl[i].hora + '</td><td>' + DAYS[fl[i].dayIdx] + '</td><td>' + nLevel(fl[i].nivel).full + '</td></tr>';
+  }
+  html += '</table><p><strong>Total:</strong> ' + fl.length + ' aula(s)</p>';
+  return html;
+}
+
+function buildSubHTML(profId) {
+  var fl = getFaltas(profId);
+  if (!fl.length) return '<p>Sem faltas registadas.</p>';
+  var allSubs = {};
+  for (var k in subs) allSubs[k] = subs[k];
+  for (var k in tmpSubs) allSubs[k] = tmpSubs[k];
+  var html = '<table><tr><th>Hora</th><th>Dia</th><th>Nível</th><th>Substituto</th></tr>';
+  for (var i=0;i<fl.length;i++) {
+    var f = fl[i];
+    var subId = allSubs[f.key];
+    var sn = subId ? (getProf(subId)?getProf(subId).nome:'') : '— Sem substituto —';
+    html += '<tr><td>' + f.hora + '</td><td>' + DAYS[f.dayIdx] + '</td><td>' + nLevel(f.nivel).full + '</td><td>' + escapeHTML(sn) + '</td></tr>';
+  }
+  html += '</table>';
+  return html;
+}
+
+// ═══ EXCEL EXPORT ═══
+function exportXLS(what) {
+  if (typeof XLSX === 'undefined') { alert('Biblioteca Excel ainda a carregar. Tente novamente em alguns segundos.'); return; }
+  var wb = XLSX.utils.book_new();
+  var d = getData();
+  if (what === 'dash') {
+    var totalA = 0, lvlC = {};
+    var allH = d.weekHoras.concat(d.satHoras, d.sunHoras);
+    for (var i=0;i<allH.length;i++) { var h=allH[i]; if(!d.schedule[h])continue; for(var di=0;di<7;di++){var sl=d.schedule[h][di]||[];for(var k=0;k<sl.length;k++){totalA++;lvlC[sl[k].nivel]=(lvlC[sl[k].nivel]||0)+1;}} }
+    var rows = [['Métrica','Valor'],['Total Aulas/Semana',totalA],['Professores',d.professors.length],['Horários',allH.length]];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Estatísticas');
+    var profRows = [['Professor','Aulas/Sem']];
+    for (var i=0;i<d.professors.length;i++) profRows.push([d.professors[i].nome, countAulas(d.professors[i].id)]);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(profRows), 'Por Professor');
+    var lvlRows = [['Nível','N.º Aulas']];
+    for (var id in lvlC) lvlRows.push([nLevel(id).full, lvlC[id]]);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(lvlRows), 'Por Nível');
+  }
+  else if (what === 'mapa') {
+    var header = ['Hora'].concat(DAYS_SHORT.slice(0,5));
+    var rows = [header];
+    for (var r=0;r<d.weekHoras.length;r++) {
+      var h = d.weekHoras[r], row = [h];
+      for (var di=0;di<5;di++) {
+        var sl = (d.schedule[h]||{})[di] || [];
+        row.push(sl.map(function(s){return nLevel(s.nivel).lb + ' ' + pName(s.profId);}).join(' / '));
+      }
+      rows.push(row);
+    }
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Semana');
+    if (d.satHoras.length) {
+      var sRows = [['Hora','Sábado']];
+      for (var r=0;r<d.satHoras.length;r++) {
+        var h = d.satHoras[r];
+        var sl = (d.schedule[h]||{})[5] || [];
+        sRows.push([h, sl.map(function(s){return nLevel(s.nivel).lb + ' ' + pName(s.profId);}).join(' / ')]);
+      }
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sRows), 'Sábado');
+    }
+    if (d.sunHoras.length) {
+      var sRows = [['Hora','Domingo']];
+      for (var r=0;r<d.sunHoras.length;r++) {
+        var h = d.sunHoras[r];
+        var sl = (d.schedule[h]||{})[6] || [];
+        sRows.push([h, sl.map(function(s){return nLevel(s.nivel).lb + ' ' + pName(s.profId);}).join(' / ')]);
+      }
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sRows), 'Domingo');
+    }
+  }
+  else if (what === 'equipa') {
+    var rows = [['Nome','Abreviatura','Telemóvel','Email','Especialidades','Disponibilidade','Observações','Aulas/Sem']];
+    for (var i=0;i<d.professors.length;i++) {
+      var p = d.professors[i];
+      var esps = (p.especialidades||[]).join(', '); if (p.espExtra) esps += (esps?', ':'') + p.espExtra;
+      rows.push([p.nome,p.abrev||'',p.tel||'',p.email||'',esps,p.disponibilidade||'',p.obs||'',countAulas(p.id)]);
+    }
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Equipa');
+  }
+  else if (what === 'indiv') {
+    var profId = document.getElementById('ps3').value;
+    if (!profId) { alert('Selecione um professor.'); return; }
+    var rows = [['Hora','Dia','Nível']];
+    var allH = d.weekHoras.concat(d.satHoras, d.sunHoras);
+    for (var i=0;i<allH.length;i++) {
+      var h = allH[i]; if(!d.schedule[h])continue;
+      for (var di=0;di<7;di++) {
+        var slots = ((d.schedule[h]||{})[di]||[]).filter(function(s){return s.profId===profId;});
+        for (var s=0;s<slots.length;s++) rows.push([h, DAYS[di], nLevel(slots[s].nivel).full]);
+      }
+    }
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Horário');
+  }
+  else if (what === 'faltas') {
+    var profId = document.getElementById('psF').value;
+    if (!profId) { alert('Selecione um professor.'); return; }
+    var fl = getFaltas(profId);
+    var rows = [['#','Hora','Dia','Nível']];
+    for (var i=0;i<fl.length;i++) rows.push([i+1, fl[i].hora, DAYS[fl[i].dayIdx], nLevel(fl[i].nivel).full]);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Faltas');
+  }
+  else if (what === 'sub') {
+    var profId = document.getElementById('psSub').value;
+    if (!profId) { alert('Selecione um professor.'); return; }
+    var fl = getFaltas(profId);
+    var allSubs = {};
+    for (var k in subs) allSubs[k] = subs[k];
+    for (var k in tmpSubs) allSubs[k] = tmpSubs[k];
+    var rows = [['Hora','Dia','Nível','Substituto']];
+    for (var i=0;i<fl.length;i++) {
+      var f = fl[i];
+      var subId = allSubs[f.key];
+      var sn = subId ? (getProf(subId)?getProf(subId).nome:'') : '';
+      rows.push([f.hora, DAYS[f.dayIdx], nLevel(f.nivel).full, sn]);
+    }
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Substituições');
+  }
+  XLSX.writeFile(wb, exportFileBase() + '_' + what + '.xlsx');
+  toast('📊 Excel exportado!');
+}
+
+// ═══ BACKUP ═══
+function saveAll() {
+  try { localStorage.setItem('emf_db', JSON.stringify(DB)); toast('💾 Guardado!'); }
+  catch (e) { toast('⚠ Erro ao guardar!'); }
+}
+function exportBackup() {
+  var blob = new Blob([JSON.stringify({version:2, exportedAt:new Date().toISOString(), pool:curPool, db:DB}, null, 2)], {type:'application/json'});
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'emn-backup-' + BASE_YEARS[curEp] + '.json'; a.click();
+  toast('⬇ Backup exportado!');
+}
+function importBackup(e) {
+  var file = e.target.files[0]; if (!file) return;
+  var r = new FileReader();
+  r.onload = function(ev) {
+    try {
+      var data = JSON.parse(ev.target.result);
+      if (data.db) {
+        for (var k in data.db) DB[k] = data.db[k];
+      }
+      if (data.pool) {
+        curPool = data.pool;
+        var p = null;
+        for (var i=0;i<POOLS.length;i++) if (POOLS[i].id===curPool) p = POOLS[i];
+        if (p) document.getElementById('pname').textContent = p.name;
+      }
+      refresh();
+      toast('⬆ Backup importado!');
+    } catch (err) { toast('⚠ Ficheiro inválido!'); }
+  };
+  r.readAsText(file); e.target.value = '';
+}
+
+// ═══ UTILS ═══
+function toast(msg) {
+  var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+function refresh() { renderSchedule(); renderProfGrid(); fillSelects(); renderDash(); }
+
+// ═══ INIT ═══
+(function() {
+  var SEED_VERSION = 'v3_sat_sun_split';
+  var savedVer = null;
+  try { savedVer = localStorage.getItem('emf_db_ver'); var sv = localStorage.getItem('emf_db'); if (sv && savedVer===SEED_VERSION) DB = JSON.parse(sv); } catch (e) {}
+  if (savedVer !== SEED_VERSION) {
+    DB = {};
+    DB['felgueiras_2025'] = { professors: [{"id": "hugo_teixeira", "nome": "Hugo Teixeira", "abrev": "HUGO", "tel": "916219187", "email": "hugo_antonio_fcl@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#1565c0"}, {"id": "samuel_marinho", "nome": "Samuel Marinho", "abrev": "SAMUEL", "tel": "913206775", "email": "Samuel27marinho@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#00695c"}, {"id": "diogo_pereira", "nome": "Diogo Pereira", "abrev": "DIOGO", "tel": "914906626", "email": "diogoefpereira@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#6a1b9a"}, {"id": "ze_teixeira", "nome": "Zé Teixeira", "abrev": "ZÉ", "tel": "916051842", "email": "zeteixeira_10@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#c62828"}, {"id": "marcelo_pinto", "nome": "Marcelo Pinto", "abrev": "MARCELO", "tel": "911125075", "email": "marfoca14@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#e65100"}, {"id": "fred_teixeira", "nome": "Fred Teixeira", "abrev": "FRED", "tel": "918581292", "email": "fredericoteixeira0901@gmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#1b5e20"}, {"id": "fatima_pereira", "nome": "Fátima Pereira", "abrev": "FÁTIMA", "tel": "926698032", "email": "fatitaflg@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#f57f17"}, {"id": "mauro_carvalho", "nome": "Mauro Carvalho", "abrev": "MAURO", "tel": "919003498", "email": "mauroflcarvalho@gmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#37474f"}, {"id": "filipe_ferreira", "nome": "Filipe Ferreira", "abrev": "FILIPE", "tel": "917768420", "email": "fpferreira19@gmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#4a148c"}, {"id": "catia_chanfana", "nome": "Cátia Chanfana", "abrev": "CÁTIA", "tel": "917135330", "email": "catia.chanfana@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#0d47a1"}, {"id": "franclim_guimaraes", "nome": "Franclim Guimarães", "abrev": "FRANCLIM", "tel": "", "email": "franclim.guimaraes@cm-felgueiras.pt", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#2e7d32"}, {"id": "tiago_machado", "nome": "Tiago Machado", "abrev": "TIAGO", "tel": "912711933", "email": "tm231877@gmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#bf360c"}, {"id": "mauro_silva", "nome": "Mauro Silva", "abrev": "MAURO", "tel": "", "email": "maurosilva790@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#ad1457"}, {"id": "erica_oliveira", "nome": "Erica Oliveira", "abrev": "ERICA", "tel": "910794706", "email": "ericaprofissional.19@gmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#283593"}, {"id": "diogo_silva", "nome": "Diogo Silva", "abrev": "DIOGO", "tel": "912848546", "email": "DIOGOFILIPE191998@GMAIL.COM", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#00838f"}], schedule:{}, weekHoras: ["08H00", "08H40", "08H50", "09H30", "10H10", "10H50", "17H30", "18H10", "18H50", "19H30", "20H10", "20H50"], satHoras: ["08H00", "08H50", "09H30", "10H10", "10H50"], sunHoras: [] };
+    DB['idaes_2025'] = { professors: [{"id": "diogo_machado", "nome": "Diogo Machado", "abrev": "DIOGO", "tel": "912711907", "email": "dm77machado@gmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#1565c0"}, {"id": "filipe_ferreira", "nome": "Filipe Ferreira", "abrev": "FILIPE", "tel": "917768420", "email": "fpferreira19@gmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#00695c"}, {"id": "carlos_cunha", "nome": "Carlos Cunha", "abrev": "CARLOS", "tel": "918596359", "email": "carlos23cunha@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#6a1b9a"}, {"id": "andre_resende", "nome": "André Resende", "abrev": "ANDRÉ", "tel": "917135201", "email": "andre.resende3@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#c62828"}, {"id": "artur_lourenco", "nome": "Artur Lourenço", "abrev": "ARTUR", "tel": "916857352", "email": "arturlourenco@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#e65100"}, {"id": "gaspar", "nome": "Gaspar", "abrev": "GASPAR", "tel": "917192927", "email": "gasvsc16@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#1b5e20"}], schedule:{}, weekHoras: ["08H00", "08H40", "08H50", "09H30", "10H10", "10H50", "17H30", "18H10", "18H50", "19H30", "20H10", "20H50"], satHoras: ["08H00", "08H50", "09H30", "10H10", "10H50"], sunHoras: [] };
+    DB['lixa_2025'] = { professors: [{"id": "carlos_cunha", "nome": "Carlos Cunha", "abrev": "CARLOS", "tel": "918596359", "email": "carlos23cunha@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#1565c0"}, {"id": "artur_lourenco", "nome": "Artur Lourenço", "abrev": "ARTUR", "tel": "916857352", "email": "arturlourenco@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#00695c"}, {"id": "miguel_costa", "nome": "Miguel Costa", "abrev": "MIGUEL", "tel": "914659475", "email": "miguelcosta24@gmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#6a1b9a"}, {"id": "alvaro_alves", "nome": "Alvaro Alves", "abrev": "ALVARO", "tel": "934747366", "email": "alvaro_alves9@hotmail.com", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#c62828"}, {"id": "ricardo_leite", "nome": "Ricardo Leite", "abrev": "RICARDO", "tel": "917702311", "email": "rijo26@sapo.pt", "especialidades": [], "disponibilidade": "", "espExtra": "", "dispExtra": "", "obs": "", "color": "#e65100"}], schedule:{}, weekHoras: ["08H00", "08H40", "08H50", "09H30", "10H10", "10H50", "17H30", "18H10", "18H50", "19H30", "20H10", "20H50"], satHoras: ["08H00", "08H50", "09H30", "10H10", "10H50"], sunHoras: [] };
+    try { localStorage.setItem('emf_db', JSON.stringify(DB)); localStorage.setItem('emf_db_ver', SEED_VERSION); } catch (e) {}
+  }
+  refresh();
+})();
+
+</script>
+</body>
+</html>
