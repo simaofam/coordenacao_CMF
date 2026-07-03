@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Registo de Presenças · EMN Felgueiras</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bd:#0a3d6b;--bm:#1565c0;--bp:#1e88e5;--aq:#00acc1;--aql:#e0f7fa;
+  --w:#fff;--g1:#f4f6f9;--g2:#e8ecf1;--g4:#9aa5b4;--g7:#3d4a5c;--g9:#1a2332;
+  --gn:#43a047;--rd:#e53935;--or:#fb8c00;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:linear-gradient(160deg,#0a3d6b 0%,#1565c0 45%,#00acc1 130%);color:var(--g9);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:18px 14px 40px;}
+.wrap{width:100%;max-width:460px;}
+.hd{display:flex;align-items:center;gap:12px;color:#fff;margin-bottom:16px;}
+.hd img{height:46px;width:auto;border-radius:8px;background:#fff;padding:3px;}
+.hd h1{font-size:1.05rem;font-weight:800;line-height:1.15;}
+.hd p{font-size:.72rem;opacity:.85;font-weight:500;}
+.card{background:var(--w);border-radius:16px;padding:20px 18px;box-shadow:0 10px 30px rgba(0,0,0,.18);margin-bottom:14px;}
+.loc{border-radius:14px;padding:16px;text-align:center;margin-bottom:14px;font-weight:600;}
+.loc.wait{background:var(--g1);color:var(--g7);}
+.loc.ok{background:#e8f5e9;color:#1b5e20;}
+.loc.bad{background:#ffebee;color:#b71c1c;}
+.loc.err{background:#fff3e0;color:#e65100;}
+.loc .big{font-size:1.15rem;font-weight:800;display:block;margin-bottom:2px;}
+.loc .sub{font-size:.78rem;font-weight:500;opacity:.9;margin-top:5px;}
+label{display:block;font-size:.78rem;font-weight:700;color:var(--g7);margin:14px 0 5px;}
+select,input{width:100%;padding:12px 12px;border:1.5px solid var(--g2);border-radius:10px;font-size:1rem;font-family:inherit;background:#fff;color:var(--g9);}
+input[type=number]{-moz-appearance:textfield;}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+select:focus,input:focus{outline:none;border-color:var(--bp);}
+.btn{width:100%;border:none;border-radius:12px;padding:15px;font-size:1.02rem;font-weight:800;font-family:inherit;color:#fff;cursor:pointer;margin-top:16px;transition:filter .15s,transform .05s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn:active{transform:scale(.98);}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.btn.enter{background:linear-gradient(135deg,#2e7d32,#43a047);}
+.btn.exit{background:linear-gradient(135deg,#e65100,#fb8c00);}
+.btn.gps{background:linear-gradient(135deg,var(--bd),var(--bp));}
+.btn.ghost{background:none;color:var(--bm);border:1.5px solid var(--g2);}
+.btn.sm{padding:11px;font-size:.9rem;margin-top:10px;}
+.status{margin-top:16px;padding:12px;border-radius:10px;font-size:.85rem;font-weight:600;text-align:center;display:none;}
+.status.show{display:block;}
+.status.done{background:#e8f5e9;color:#1b5e20;}
+.status.info{background:var(--aql);color:#006064;}
+.status.errm{background:#ffebee;color:#b71c1c;}
+.mini{font-size:.72rem;color:var(--g4);text-align:center;margin-top:6px;}
+.todaybox{background:var(--g1);border-radius:10px;padding:12px 14px;margin-top:14px;font-size:.82rem;color:var(--g7);}
+.todaybox b{color:var(--g9);}
+.foot{text-align:center;margin-top:6px;}
+.foot a{color:#e0f7fa;font-size:.78rem;text-decoration:none;font-weight:600;opacity:.8;cursor:pointer;}
+.hidden{display:none!important;}
+h2.sec{font-size:1rem;font-weight:800;color:var(--bd);margin-bottom:4px;}
+.sub2{font-size:.76rem;color:var(--g4);margin-bottom:14px;}
+.poolrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--g2);}
+.poolrow .nm{font-weight:700;font-size:.86rem;color:var(--g9);}
+.poolrow .co{font-size:.72rem;color:var(--g4);}
+.poolrow button{width:auto;padding:8px 12px;font-size:.78rem;margin:0;border-radius:9px;background:var(--bp);color:#fff;border:none;font-weight:700;cursor:pointer;}
+.rec{background:var(--g1);border-radius:9px;padding:10px 12px;margin-bottom:8px;font-size:.8rem;}
+.rec .r1{font-weight:700;color:var(--g9);display:flex;justify-content:space-between;}
+.rec .r2{color:var(--g7);margin-top:3px;font-size:.76rem;}
+.badge{font-size:.66rem;font-weight:800;padding:2px 7px;border-radius:20px;}
+.badge.open{background:#fff3e0;color:#e65100;}
+.badge.clo{background:#e8f5e9;color:#1b5e20;}
+.tt{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.tt button{flex:1;padding:9px;border:none;border-radius:9px;background:var(--g1);color:var(--g7);font-weight:700;font-size:.78rem;cursor:pointer;font-family:inherit;}
+.tt button.act{background:var(--bd);color:#fff;}
+.note{font-size:.72rem;color:var(--g4);line-height:1.5;margin-top:14px;background:var(--g1);padding:10px 12px;border-radius:9px;}
+.topnav{display:flex;gap:6px;background:rgba(255,255,255,.15);padding:5px;border-radius:12px;margin-bottom:14px;}
+.topnav button{flex:1;padding:11px 6px;border:none;border-radius:9px;background:transparent;color:#fff;font-weight:700;font-size:.84rem;font-family:inherit;cursor:pointer;opacity:.85;}
+.topnav button.act{background:#fff;color:var(--bd);opacity:1;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+.pcard{background:var(--w);border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.pcard .ph{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.pcard .pt{font-weight:800;color:var(--bd);font-size:.92rem;line-height:1.2;}
+.pcard .pm{font-size:.74rem;color:var(--g7);margin-top:4px;line-height:1.55;}
+.st{font-size:.64rem;font-weight:800;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+.st.pend{background:#fff3e0;color:#e65100;}
+.st.aprov{background:#e8f5e9;color:#1b5e20;}
+.st.devol{background:#ffebee;color:#b71c1c;}
+.exrow{background:var(--g1);border-radius:10px;padding:11px;margin-top:9px;}
+.exrow .exh{display:flex;justify-content:space-between;align-items:center;}
+.exrow .exn{font-weight:800;color:var(--bd);font-size:.8rem;}
+.exrow .exdel{background:var(--rd);color:#fff;border:none;border-radius:7px;padding:5px 9px;font-size:.68rem;font-weight:700;cursor:pointer;}
+.exsave{background:var(--aq);color:#fff;border:none;border-radius:8px;padding:8px 11px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;}
+.exsvmsg{font-size:.7rem;font-weight:600;color:var(--g4);}
+.exsvmsg.ok{color:#1b5e20;}
+.exsvmsg.info{color:#e65100;}
+.exsvmsg.err{color:var(--rd);}
+.modalOverlay{position:fixed;inset:0;background:rgba(10,20,35,.55);z-index:500;display:flex;align-items:flex-end;justify-content:center;padding:0;}
+.modalCard{background:#fff;border-radius:18px 18px 0 0;padding:18px 16px 22px;width:100%;max-width:460px;max-height:86vh;overflow-y:auto;box-shadow:0 -8px 30px rgba(0,0,0,.25);}
+.modalHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.modalX{background:var(--g1);border:none;border-radius:50%;width:32px;height:32px;font-size:1rem;color:var(--g7);cursor:pointer;flex-shrink:0;}
+.eximCard{background:var(--g1);border-radius:10px;padding:11px 12px;margin-bottom:8px;}
+.eximCard .eb{font-size:.68rem;font-weight:800;color:var(--bm);text-transform:uppercase;letter-spacing:.02em;margin-bottom:3px;}
+.eximCard .ex{font-size:.8rem;color:var(--g7);line-height:1.5;margin-bottom:2px;}
+.eximCard .ex b{color:var(--g9);}
+.eximCard button{margin-top:8px;width:100%;padding:9px;border:none;border-radius:8px;background:var(--gn);color:#fff;font-weight:700;font-size:.8rem;cursor:pointer;font-family:inherit;}
+.eximCard button.added{background:var(--g4);}
+.exrow label{margin:9px 0 3px;font-size:.72rem;}
+.exrow textarea,.exrow select,.exrow input{width:100%;padding:9px;border:1.5px solid var(--g2);border-radius:8px;font-family:inherit;font-size:.92rem;background:#fff;color:var(--g9);}
+textarea{resize:vertical;min-height:42px;font-family:inherit;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;}
+.chip{border:1.5px solid var(--g2);border-radius:20px;padding:7px 12px;font-size:.78rem;cursor:pointer;background:#fff;color:var(--g7);user-select:none;}
+.chip.on{background:var(--bp);border-color:var(--bp);color:#fff;font-weight:700;}
+.pdet table{width:100%;border-collapse:collapse;margin-top:6px;font-size:.68rem;}
+.pdet th,.pdet td{border:1px solid var(--g2);padding:5px 6px;text-align:left;vertical-align:top;}
+.pdet th{background:var(--g1);font-weight:700;color:var(--g9);}
+.note2{background:#ffebee;color:#b71c1c;padding:8px 10px;border-radius:8px;font-size:.76rem;margin-top:8px;font-weight:600;line-height:1.4;}
+.nivelbar{display:flex;gap:6px;overflow-x:auto;padding:12px 2px 2px;-webkit-overflow-scrolling:touch;}
+.nivelbar button{white-space:nowrap;padding:9px 13px;border:1.5px solid var(--g2);border-radius:20px;background:#fff;color:var(--g7);font-weight:700;font-size:.78rem;font-family:inherit;cursor:pointer;flex-shrink:0;}
+.nivelbar button.act{background:var(--bd);border-color:var(--bd);color:#fff;}
+.hist{background:#eef3f8;border-radius:8px;padding:8px 10px;margin-top:8px;font-size:.72rem;color:var(--g7);line-height:1.5;}
+.hist b{color:var(--g9);}
+.pact{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.pact button{flex:1;min-width:78px;padding:8px;border:none;border-radius:8px;font-weight:700;font-size:.74rem;cursor:pointer;color:#fff;}
+textarea{width:100%;padding:11px;border:1.5px solid var(--g2);border-radius:10px;font-size:.95rem;background:#fff;color:var(--g9);resize:vertical;min-height:44px;font-family:inherit;}
+.bibNivel{font-weight:800;color:#fff;background:var(--bd);border-radius:8px;padding:8px 12px;margin:16px 0 8px;font-size:.9rem;display:flex;justify-content:space-between;align-items:center;}
+.bibNivel .cnt{background:rgba(255,255,255,.25);border-radius:20px;padding:1px 9px;font-size:.72rem;}
+.bibCont{font-weight:700;color:var(--bm);font-size:.82rem;margin:10px 0 6px;border-left:3px solid var(--aq);padding-left:8px;}
+.bibcard{background:var(--g1);border-radius:10px;padding:11px 12px;margin-bottom:8px;}
+.bibcard .bx{font-size:.8rem;color:var(--g7);line-height:1.5;margin-bottom:4px;}
+.bibcard .bx b{color:var(--g9);}
+.bibcard .bmeta{font-size:.68rem;color:var(--g4);margin-top:6px;}
+hr{border:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <img src="data:image/jpeg;base64,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SN90/SoozhsetfN9nJtk2Ho3868x1W38613qPnj5HuO9ZWnzeXPsJ+V+Px7VLV+sGtaiiiiikb7p+lIfun6UV5TqH/IRuv8Ars//AKEa900v/kFWf/XvH/6CK9m0z/kGWn/XFP8A0EVGepqvVqrNJWLdf8fUv+8aSikqLvRRRXsfg3/kVNO/65f1NTx/cFFSr90VtU6iloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooqO4/495P8AcP8AKmv/AKtvoaRvun6VBXzQOOlefdqwKmU5XNaUMnmRhu/f61zt/b/ZrpkA+Q/Mv0ratJvOgVj94cN9aWpKrVNRSN90/SkP3T9KK+eta1G9TW79VupQBcyAAN0+Y17jphP9lWfP/LCP/wBBFezaZ/yDLT/rin/oIqAk5NUv7Tvv+fub/vo1ayfWrNGTU1hDq2q3XkWKXFzM3JCc/iT2+poG5jgZNFAyTxXofh/4bz/LPr98/r9ngf8A9Cb/AA/OpUhPVj+Aop6x/wB416JaW0Fnax21rGI4Y12oo7CpgMDAoqQcVLRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRUdx/x7yf7h/lTX/wBW30NI33T9Kgr5nrz6sCnRnDY9as2cm2TYejfzqlqtv51qXUfPHyPcd6tafN5c+0/dfj8e1S1erBrWopG+6fpSH7p+lFfPV3pt7qnia/t9PtpbiU3MnyoucfMeSew+te46WCdLswBn9xH/AOgivZtM/wCQZaf9cU/9BFQYJY4Heu38P/C37s+v3Hv9ngP/AKE3+H51fSHu5/AVZp6x/wB6vRNP06y0y2FvYW0VvEP4UXGfc+p+tSgBRgDFFSAAdBVqlooooooozRmiiiiiiiiiiiiiiiiiimu6xoXkYKqjJYnAAprukaM8jBVUZLMcACikJCgliAB1Jqrp2q2OqCZtPuFnSF/Ldk+7uxnAPfr2qppurWGqrM2n3CTpC/lu6fd3Yzwe/XtSKwbO05xUdvcw3IcwSBwjbSR0zVyrtLUtFFFFFFFFFFFFFFFFFFFF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9u0VNiRzlCFHqSFBJ46k0KpH8RP1ogt3hbLXMsoAwFfHH5DmmPolu+lXenGSXyrp5HdsjcC7Fjjj1NRvoNs+kXmmmSXyruSR3bI3AuxY449TSbBtK+tNNnGbWW33NtlLEnuMnNWtRs01Cwms5HdI5l2uUODt7j8Rx+NW9Ssk1HT5rKWSRI512OUODt7j8Rx+NKw3Aj1qW4hE8DxMzBXGCR1xUMGkWdrqC3lpElu3lGJkiQKrgkEEgDqMcfU1Db6NZWupLe2cKW7eUYnSJFVHBIIJAHUY4PuaAoDZAxTEtIY5xNEojO0qQoAB+tN07Sjp9zNJHe3DwyyPJ5DhNqs7biQQM9c96ZpukHTrqeSK+uXhmkkl+zuE2KztuJBC56k96RV2k8nB7UkFr5Ejss0hRmZthxgEnPpmtGtOnVYoooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooor/9k=" alt="CMF">
+    <div>
+      <h1>EMN Felgueiras</h1>
+      <p>Presenças · Planos de Aula</p>
+    </div>
+  </div>
+
+  <div class="topnav">
+    <button id="navPres" class="act">📍 Presenças</button>
+    <button id="navPlanos">📋 Planos</button>
+    <button id="navBiblio">📚 Exercícios</button>
+  </div>
+
+  <!-- ============ VISTA PROFESSOR ============ -->
+  <div id="viewProf">
+    <div class="card">
+      <div id="loc" class="loc wait">
+        <span class="big">📍 Localização</span>
+        <span class="sub">Toca no botão para detetar em que piscina estás.</span>
+      </div>
+      <button id="btnGps" class="btn gps">📡 Ativar localização</button>
+
+      <div id="markArea" class="hidden">
+        <label for="selProf">Professor(a)</label>
+        <select id="selProf"><option value="">— seleciona o teu nome —</option></select>
+
+        <label for="inPin" id="pinLbl">PIN pessoal</label>
+        <input id="inPin" type="tel" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off">
+
+        <div id="todayBox" class="todaybox hidden"></div>
+
+        <button id="btnEnter" class="btn enter">🟢 Registar ENTRADA</button>
+        <button id="btnExit" class="btn exit hidden">🟠 Registar SAÍDA</button>
+
+        <div id="status" class="status"></div>
+      </div>
+    </div>
+    <div class="foot"><a id="lnkAdmin">⚙︎ Administração</a></div>
+  </div>
+
+  <!-- ============ VISTA PLANOS ============ -->
+  <div id="viewPlanos" class="hidden">
+    <div class="card">
+      <button id="btnNewPlano" class="btn gps">＋ Novo plano de aula</button>
+      <div id="nivelBar" class="nivelbar"></div>
+      <div id="planoList" style="margin-top:14px;"><div class="mini">A carregar…</div></div>
+    </div>
+    <div class="foot"><a id="lnkAdmin2">⚙︎ Administração</a></div>
+  </div>
+
+  <!-- ============ FORMULÁRIO DE PLANO ============ -->
+  <div id="viewPlanoForm" class="hidden">
+    <div class="card">
+      <h2 class="sec" id="pfTitle">Novo plano de aula</h2>
+      <div class="sub2">O mesmo plano aplica-se a todas as aulas do período indicado (mínimo 4 aulas).</div>
+
+      <label for="pfNivel">Nível</label>
+      <select id="pfNivel"></select>
+
+      <label for="pfNum">Nº do plano de aula</label>
+      <select id="pfNum"></select>
+
+      <div style="display:flex;gap:10px;">
+        <div style="flex:1;"><label for="pfDe">Aplicar de</label><input id="pfDe" type="date"></div>
+        <div style="flex:1;"><label for="pfAte">até</label><input id="pfAte" type="date"></div>
+      </div>
+
+      <label>Grupo — professores (toca para selecionar)</label>
+      <div id="pfGrupo" class="chips"></div>
+
+      <label style="margin-top:16px;">Exercícios</label>
+      <div id="pfExs"></div>
+      <button id="pfAddEx" class="btn ghost sm">＋ Adicionar exercício</button>
+      <button id="pfImportEx" class="btn ghost sm">📥 Importar exercício da biblioteca</button>
+      <button id="pfSaveAllEx" class="btn ghost sm">💾 Guardar todos na biblioteca</button>
+      <div id="pfSaveAllMsg" class="mini"></div>
+
+      <hr style="border:none;border-top:1px solid var(--g2);margin:18px 0 2px;">
+      <div id="pfSubmitter">
+        <label for="pfProf" id="pfProfLbl">Submetido por</label>
+        <select id="pfProf"></select>
+        <label for="pfPin">PIN pessoal</label>
+        <input id="pfPin" type="tel" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off">
+      </div>
+
+      <div id="pfStatus" class="status"></div>
+      <div style="display:flex;gap:8px;">
+        <button id="pfSubmit" class="btn enter" style="flex:1;">Submeter</button>
+        <button id="pfCancel" class="btn ghost" style="flex:1;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ VISTA BIBLIOTECA DE EXERCÍCIOS ============ -->
+  <div id="viewBiblio" class="hidden">
+    <div class="card">
+      <div style="display:flex;gap:8px;">
+        <button id="btnNewEx" class="btn gps" style="flex:1;">＋ Novo exercício</button>
+        <button id="btnImportEx" class="btn ghost" style="flex:1;">⬇ Importar dos planos</button>
+      </div>
+      <label for="exfNivel">Filtrar por nível</label>
+      <select id="exfNivel"></select>
+      <div id="exfConteudoWrap"><label for="exfConteudo">Filtrar por conteúdo</label><select id="exfConteudo"></select></div>
+      <label for="exfSearch">Pesquisar (texto livre)</label>
+      <input id="exfSearch" type="text" placeholder="palavra-chave em qualquer campo…">
+      <div id="biblioList" style="margin-top:14px;"><div class="mini">A carregar…</div></div>
+    </div>
+    <div class="foot"><a id="lnkAdmin3">⚙︎ Administração</a></div>
+  </div>
+
+  <!-- ============ FORMULÁRIO DE EXERCÍCIO ============ -->
+  <div id="viewExForm" class="hidden">
+    <div class="card">
+      <h2 class="sec" id="exFormTitle">Novo exercício</h2>
+      <label for="exNivel">Nível</label>
+      <select id="exNivel"></select>
+      <label>Conteúdo</label>
+      <div id="exConteudoWrap"></div>
+      <label for="exDesc">Descrição</label>
+      <textarea id="exDesc"></textarea>
+      <label for="exCrit">Critérios de êxito</label>
+      <textarea id="exCrit"></textarea>
+      <label for="exErros">Erros comuns</label>
+      <textarea id="exErros"></textarea>
+      <label for="exFb">Feedbacks</label>
+      <textarea id="exFb"></textarea>
+      <hr style="border:none;border-top:1px solid var(--g2);margin:16px 0 2px;">
+      <label for="exAutor">Autor</label>
+      <select id="exAutor"></select>
+      <label for="exPin">PIN pessoal</label>
+      <input id="exPin" type="tel" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off">
+      <div id="exStatus" class="status"></div>
+      <div style="display:flex;gap:8px;">
+        <button id="exSave" class="btn enter" style="flex:1;">Guardar</button>
+        <button id="exCancel" class="btn ghost" style="flex:1;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: IMPORTAR EXERCÍCIO DA BIBLIOTECA ============ -->
+  <div id="eximOverlay" class="modalOverlay hidden">
+    <div class="modalCard">
+      <div class="modalHead">
+        <h2 class="sec" style="margin:0;">📥 Importar exercício</h2>
+        <button id="eximClose" class="modalX">✕</button>
+      </div>
+      <label for="eximNivel">Nível</label>
+      <select id="eximNivel"></select>
+      <div id="eximContWrap"><label for="eximConteudo">Conteúdo</label><select id="eximConteudo"></select></div>
+      <label for="eximSearch">Pesquisar (texto livre)</label>
+      <input id="eximSearch" type="text" placeholder="palavra-chave em qualquer campo…">
+      <div id="eximList" style="margin-top:12px;"><div class="mini">A carregar…</div></div>
+    </div>
+  </div>
+
+  <!-- ============ VISTA ADMIN ============ -->
+  <div id="viewAdmin" class="hidden">
+    <div class="card">
+      <h2 class="sec">⚙︎ Administração</h2>
+      <div class="sub2">Área do coordenador</div>
+      <div class="tt">
+        <button data-at="geo" class="act">Piscinas</button>
+        <button data-at="recs">Registos</button>
+        <button data-at="planos">Planos</button>
+        <button data-at="pins">PINs</button>
+        <button data-at="cfg">Definições</button>
+      </div>
+
+      <!-- Geofences -->
+      <div id="atGeo">
+        <div class="sub2">Define o centro de cada piscina. O melhor é ires ao local e tocar em <b>“Capturar aqui”</b> com o telemóvel — fica mais preciso do que copiar do Google Maps.</div>
+        <div id="poolList"></div>
+        <label for="inRadius">Raio de tolerância (metros)</label>
+        <input id="inRadius" type="number" min="20" max="2000" step="10" value="200">
+        <button id="btnSaveRadius" class="btn gps sm">Guardar raio</button>
+      </div>
+
+      <!-- Registos -->
+      <div id="atRecs" class="hidden">
+        <label for="recDate">Dia</label>
+        <input id="recDate" type="date">
+        <button id="btnAddRec" class="btn gps sm">＋ Registar presença manualmente</button>
+
+        <div id="recForm" class="hidden" style="background:var(--g1);border-radius:12px;padding:14px;margin-top:12px;">
+          <div id="recFormTitle" style="font-weight:800;color:var(--bd);margin-bottom:4px;">Nova presença</div>
+          <label for="rfPool">Piscina</label>
+          <select id="rfPool"></select>
+          <label for="rfProf">Professor(a)</label>
+          <select id="rfProf"></select>
+          <label for="rfDate">Data</label>
+          <input id="rfDate" type="date">
+          <label for="rfIn">Entrada</label>
+          <input id="rfIn" type="time">
+          <label for="rfOut">Saída (opcional)</label>
+          <input id="rfOut" type="time">
+          <div style="display:flex;gap:8px;">
+            <button id="rfSave" class="btn enter sm" style="flex:1;">Guardar</button>
+            <button id="rfCancel" class="btn ghost sm" style="flex:1;">Cancelar</button>
+          </div>
+        </div>
+
+        <div id="recList" style="margin-top:12px;"></div>
+        <button id="btnExport" class="btn ghost sm">⬇︎ Exportar CSV (este dia)</button>
+      </div>
+
+      <!-- PINs -->
+      <div id="atPins" class="hidden">
+        <div class="sub2">Cada professor define o seu PIN na primeira marcação. Aqui podes apagá-lo (para ele poder definir outro).</div>
+        <div id="pinList"></div>
+      </div>
+
+      <!-- Definições -->
+      <div id="atCfg" class="hidden">
+        <label for="inCloud">URL da Firebase</label>
+        <input id="inCloud" type="text" placeholder="https://...firebasedatabase.app">
+        <button id="btnSaveCloud" class="btn gps sm">Guardar URL</button>
+        <label for="inAdminPin" style="margin-top:18px;">PIN de administrador</label>
+        <input id="inAdminPin" type="tel" inputmode="numeric" maxlength="6" placeholder="novo PIN">
+        <button id="btnSaveAdminPin" class="btn gps sm">Definir PIN admin</button>
+        <div class="note">🔒 <b>Nota de segurança:</b> os PINs e registos ficam na Firebase e a validação de localização é feita no telemóvel. Serve como registo de confiança e dissuasor — não é um controlo à prova de fraude.</div>
+      </div>
+
+      <!-- Aprovação de Planos -->
+      <div id="atPlanos" class="hidden">
+        <div class="sub2">Aprova, devolve (com nota) ou elimina os planos submetidos pelos professores. Pendentes aparecem primeiro.</div>
+        <div id="admPlanoList"><div class="mini">A carregar…</div></div>
+      </div>
+
+      <button id="btnBack" class="btn ghost sm" style="margin-top:18px;">← Voltar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   CONFIG — Simão: mete aqui o teu URL da Firebase (o mesmo da app principal)
+   ═══════════════════════════════════════════════════════════ */
+var CLOUD_URL = 'https://coordenacao-cmf-default-rtdb.europe-west1.firebasedatabase.app';
+
+var POOLS = [
+  {id:'felgueiras', name:'Piscina Municipal de Felgueiras'},
+  {id:'lixa',       name:'Piscina Municipal da Lixa'},
+  {id:'idaes',      name:'Piscina Municipal de Idães'}
+];
+
+/* ---- resolver URL: constante > localStorage da app principal ---- */
+function resolveCloud(){
+  var c = CLOUD_URL;
+  if (!c || c.indexOf('COLOCAR') === 0 || !/^https?:\/\//.test(c)) {
+    try { c = localStorage.getItem('emf_cloud_url') || localStorage.getItem('emf_presencas_url') || null; } catch(e){ c = null; }
+  }
+  return c ? c.replace(/\/+$/,'') : null;
+}
+var CLOUD = resolveCloud();
+
+/* ---- estado ---- */
+var cfg = {radius:200, pools:{}, adminPin:null};
+var pins = {};
+var professors = [];
+var detectedPool = null;
+var lastFix = null;
+var editingRef = null;
+var curTab = 'pres';
+
+/* ---- planos de aula ---- */
+var planos = [];
+var pfGrupoSel = {};
+var pfExsData = [];
+var pfEditId = null;
+var pfMode = 'prof';
+var planoFilter = 'todos';
+var NIVEL_ORDER = ['beb','ini','1c','2c','3c','1a','2a','hid'];
+
+/* ---- biblioteca de exercícios ---- */
+var exercicios = [];
+var exFilterNivel = 'todos';
+var exFilterConteudo = 'todos';
+var exSearch = '';
+var exEditId = null;
+
+/* ---- importar exercício para o plano ---- */
+var eximNivel = 'todos';
+var eximConteudo = 'todos';
+var eximSearch = '';
+var PLANO_NIVEIS = [
+  {id:'ini', nome:'Nível Iniciação'},
+  {id:'1c',  nome:'Nível 1 Crianças'},
+  {id:'2c',  nome:'Nível 2 Crianças'},
+  {id:'3c',  nome:'Nível 3 Crianças'},
+  {id:'1a',  nome:'Nível 1 Adultos'},
+  {id:'2a',  nome:'Nível 2 Adultos'},
+  {id:'beb', nome:'Bebés'},
+  {id:'hid', nome:'Hidroginástica'}
+];
+var CONTEUDOS = {
+  'ini':['Respiração','Equilíbrio','Imersão','Salto','Propulsão'],
+  '1c' :['Imersão','Respiração','Equilíbrio','Propulsão','Salto'],
+  '2c' :['Membros Inferiores de Costas','Membros Superiores de Costas','Técnica Completa de Costas','Crol Membros Inferiores','Crol Membros Superiores','Crol Técnica Completa','Bruços Membros Inferiores','Saltos'],
+  '3c' :['Técnica de Crol Completa','Técnica de Costas Completa','Técnica de Bruços Completa','Técnica de Mariposa Completa','Viragens','Partidas','Saltos'],
+  '1a' :['Membros Inferiores de Costas','Membros Superiores de Costas','Técnica Completa de Costas','Crol Membros Inferiores','Crol Membros Superiores','Crol Técnica Completa','Bruços Membros Inferiores','Saltos'],
+  '2a' :['Técnica de Crol Completa','Técnica de Costas Completa','Técnica de Bruços Completa','Técnica de Mariposa Completa','Viragens','Partidas','Saltos'],
+  'beb':null,
+  'hid':null
+};
+
+/* ═══ util ═══ */
+function $(id){ return document.getElementById(id); }
+function slug(s){ return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,''); }
+function pad(n){ return n<10 ? '0'+n : ''+n; }
+function todayStr(d){ d = d||new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function hm(d){ d = d?new Date(d):new Date(); return pad(d.getHours())+':'+pad(d.getMinutes()); }
+function poolName(id){ for(var i=0;i<POOLS.length;i++) if(POOLS[i].id===id) return POOLS[i].name; return id; }
+function hashPin(s){ var h=5381,i; s=String(s); for(i=0;i<s.length;i++){ h=((h<<5)+h+s.charCodeAt(i))>>>0; } return 'h'+h.toString(36); }
+function haversine(a,b,c,d){
+  var R=6371000, r=Math.PI/180;
+  var dLat=(c-a)*r, dLng=(d-b)*r;
+  var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return 2*R*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+/* ═══ Firebase REST ═══ */
+function fbGet(path){
+  if(!CLOUD) return Promise.reject(new Error('sem URL'));
+  return fetch(CLOUD+'/'+path+'.json').then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
+}
+function fbPut(path,data){
+  return fetch(CLOUD+'/'+path+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
+}
+
+/* ═══ carregar config + professores ═══ */
+function loadAll(){
+  return Promise.all([
+    fbGet('emn_presencas_cfg').then(function(d){ if(d){ cfg.radius=d.radius||200; cfg.pools=d.pools||{}; cfg.adminPin=d.adminPin||null; } }).catch(function(){}),
+    fbGet('emn_pins').then(function(d){ pins=d||{}; }).catch(function(){}),
+    fbGet('emn_db').then(function(pkg){ professors = extractProfs(pkg); }).catch(function(){})
+  ]);
+}
+function extractProfs(pkg){
+  var db = (pkg && pkg.db) ? pkg.db : pkg;
+  var seen={}, out=[];
+  if(db && typeof db==='object'){
+    Object.keys(db).forEach(function(k){
+      var ps = db[k] && db[k].professors;
+      if(Array.isArray(ps)) ps.forEach(function(p){
+        if(!p || !p.nome) return;
+        var sk=slug(p.nome);
+        if(!seen[sk]){ seen[sk]=1; out.push({key:sk, nome:p.nome}); }
+      });
+    });
+  }
+  out.sort(function(a,b){ return a.nome.localeCompare(b.nome,'pt'); });
+  return out;
+}
+
+/* ═══ GPS ═══ */
+function requestGps(onFix){
+  if(!navigator.geolocation){ setLoc('err','GPS indisponível','O teu navegador não suporta localização.'); return; }
+  setLoc('wait','A localizar…','Aguarda uns segundos e autoriza o acesso à localização.');
+  navigator.geolocation.getCurrentPosition(function(pos){
+    lastFix = {lat:pos.coords.latitude, lng:pos.coords.longitude, acc:pos.coords.accuracy};
+    if(onFix){ onFix(lastFix); } else { evalPool(lastFix); }
+  }, function(err){
+    var m = err.code===1 ? 'Autorização de localização recusada.' : (err.code===3 ? 'Demorou demasiado. Tenta outra vez.' : 'Não foi possível obter a localização.');
+    setLoc('err','Sem localização', m);
+  }, {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+}
+function nearestPool(fix){
+  var best=null;
+  POOLS.forEach(function(p){
+    var c = cfg.pools[p.id];
+    if(!c || c.lat==null) return;
+    var d = haversine(fix.lat,fix.lng,c.lat,c.lng);
+    if(!best || d<best.dist) best={id:p.id, dist:d};
+  });
+  return best;
+}
+function evalPool(fix){
+  var configured = POOLS.some(function(p){ return cfg.pools[p.id] && cfg.pools[p.id].lat!=null; });
+  if(!configured){ setLoc('err','Piscinas por configurar','O coordenador ainda não definiu as coordenadas das piscinas.'); return; }
+  var nb = nearestPool(fix);
+  if(nb && nb.dist <= cfg.radius){
+    detectedPool = nb.id;
+    setLoc('ok', '✅ '+poolName(nb.id), 'Estás a ~'+Math.round(nb.dist)+' m do centro · precisão do GPS ±'+Math.round(fix.acc)+' m');
+    $('markArea').classList.remove('hidden');
+    $('btnGps').textContent = '🔄 Atualizar localização';
+    refreshTodayState();
+  } else {
+    detectedPool = null;
+    var extra = nb ? ('A mais próxima é '+poolName(nb.id)+', a ~'+Math.round(nb.dist)+' m (limite '+cfg.radius+' m).') : '';
+    setLoc('bad','❌ Fora de uma piscina', extra+' Precisão do GPS ±'+Math.round(fix.acc)+' m. Aproxima-te e tenta de novo.');
+    $('markArea').classList.add('hidden');
+  }
+}
+function setLoc(cls,big,sub){
+  var el=$('loc'); el.className='loc '+cls;
+  el.innerHTML='<span class="big">'+esc(big)+'</span><span class="sub">'+esc(sub)+'</span>';
+}
+
+/* ═══ estado do dia para o professor selecionado ═══ */
+var openRec = null;
+function refreshTodayState(){
+  openRec=null;
+  $('todayBox').classList.add('hidden');
+  $('btnEnter').classList.add('hidden');
+  $('btnExit').classList.add('hidden');
+  var pk = $('selProf').value;
+  if(!pk || !detectedPool) return;
+  var date=todayStr();
+  fbGet('emn_presencas/'+detectedPool+'/'+date).then(function(recs){
+    var mine=[]; if(recs) Object.keys(recs).forEach(function(id){ var r=recs[id]; r._id=id; if(r.profKey===pk) mine.push(r); });
+    mine.sort(function(a,b){ return (a.entrada||'').localeCompare(b.entrada||''); });
+    var open = mine.filter(function(r){ return !r.saida; });
+    var box='';
+    if(mine.length){
+      box='<b>Hoje nesta piscina:</b><br>';
+      mine.forEach(function(r){ box+='• Entrada '+esc(r.entradaHora)+(r.saida?(' → Saída '+esc(r.saidaHora)):' <b>(em curso)</b>')+'<br>'; });
+    } else { box='Ainda não tens registos hoje nesta piscina.'; }
+    $('todayBox').innerHTML=box; $('todayBox').classList.remove('hidden');
+    if(open.length){ openRec=open[0]; $('btnExit').classList.remove('hidden'); }
+    else { $('btnEnter').classList.remove('hidden'); }
+  }).catch(function(){
+    $('btnEnter').classList.remove('hidden');
+  });
+}
+
+/* ═══ verificar PIN ═══ */
+function checkPin(pk, pin){
+  // devolve: 'ok' | 'set' (primeira vez, definir) | 'wrong'
+  if(!pins[pk]) return 'set';
+  return pins[pk]===hashPin(pin) ? 'ok' : 'wrong';
+}
+function showStatus(cls,msg){ var s=$('status'); s.className='status show '+cls; s.innerHTML=msg; }
+
+function doMark(kind){
+  var pk=$('selProf').value, pin=$('inPin').value.trim();
+  if(!pk){ showStatus('errm','Seleciona o teu nome.'); return; }
+  if(!/^\d{4,6}$/.test(pin)){ showStatus('errm','Introduz um PIN de 4 a 6 dígitos.'); return; }
+  if(!detectedPool){ showStatus('errm','Localização não confirmada.'); return; }
+  var st=checkPin(pk,pin);
+  if(st==='wrong'){ showStatus('errm','PIN incorreto.'); return; }
+  var firstTime = (st==='set');
+
+  showStatus('info','A obter localização atual…');
+  requestGps(function(fix){
+    var nb=nearestPool(fix);
+    if(!nb || nb.dist>cfg.radius){ showStatus('errm','Já não estás dentro da piscina (a ~'+Math.round(nb?nb.dist:0)+' m). Marcação cancelada.'); return; }
+    if(nb.id!==detectedPool){ detectedPool=nb.id; }
+    var prof = professors.filter(function(p){return p.key===pk;})[0];
+    var nome = prof?prof.nome:pk;
+    var date=todayStr(), now=new Date();
+
+    var savePin = firstTime ? fbPut('emn_pins/'+pk, hashPin(pin)).then(function(){ pins[pk]=hashPin(pin); }) : Promise.resolve();
+
+    savePin.then(function(){
+      if(kind==='enter'){
+        var id='r'+now.getTime()+'_'+Math.floor(Math.random()*1000);
+        var rec={id:id, profKey:pk, nome:nome, pool:detectedPool, poolName:poolName(detectedPool), date:date,
+          entrada:now.toISOString(), entradaHora:hm(now), entradaLat:fix.lat, entradaLng:fix.lng, entradaDist:Math.round(nb.dist), entradaAcc:Math.round(fix.acc),
+          saida:null};
+        return fbPut('emn_presencas/'+detectedPool+'/'+date+'/'+id, rec).then(function(){
+          showStatus('done','✅ ENTRADA registada às '+hm(now)+(firstTime?' · PIN criado.':''));
+          $('inPin').value=''; refreshTodayState();
+        });
+      } else {
+        if(!openRec){ showStatus('errm','Não há entrada em aberto para fechar.'); return; }
+        openRec.saida=now.toISOString(); openRec.saidaHora=hm(now);
+        openRec.saidaLat=fix.lat; openRec.saidaLng=fix.lng; openRec.saidaDist=Math.round(nb.dist); openRec.saidaAcc=Math.round(fix.acc);
+        var id=openRec._id||openRec.id; var clean={}; Object.keys(openRec).forEach(function(k){ if(k!=='_id') clean[k]=openRec[k]; });
+        return fbPut('emn_presencas/'+detectedPool+'/'+date+'/'+id, clean).then(function(){
+          showStatus('done','✅ SAÍDA registada às '+hm(now)+'. Bom trabalho!');
+          $('inPin').value=''; refreshTodayState();
+        });
+      }
+    }).catch(function(e){ showStatus('errm','Erro ao gravar: '+e.message); });
+  });
+}
+
+/* ═══ preencher professores ═══ */
+function fillProfs(){
+  var sel=$('selProf'); sel.innerHTML='<option value="">— seleciona o teu nome —</option>';
+  if(!professors.length){
+    // fallback: permitir nome livre
+    sel.insertAdjacentHTML('beforeend','<option value="__free__">✎ Escrever o meu nome…</option>');
+  }
+  professors.forEach(function(p){ sel.insertAdjacentHTML('beforeend','<option value="'+esc(p.key)+'">'+esc(p.nome)+'</option>'); });
+}
+
+/* ═══════════ ADMIN ═══════════ */
+function openAdmin(){
+  var pin = prompt('PIN de administrador'+(cfg.adminPin?':':' (ainda não definido — escolhe um agora):'));
+  if(pin==null) return;
+  if(cfg.adminPin){
+    if(hashPin(pin)!==cfg.adminPin){ alert('PIN incorreto.'); return; }
+  } else {
+    if(!/^\d{4,6}$/.test(pin)){ alert('Escolhe um PIN de 4 a 6 dígitos.'); return; }
+    cfg.adminPin=hashPin(pin); saveCfg();
+  }
+  $('viewProf').classList.add('hidden');
+  $('viewPlanos').classList.add('hidden');
+  $('viewPlanoForm').classList.add('hidden');
+  $('viewBiblio').classList.add('hidden');
+  $('viewExForm').classList.add('hidden');
+  $('viewAdmin').classList.remove('hidden');
+  renderPools(); $('inRadius').value=cfg.radius; $('inCloud').value=CLOUD||'';
+  $('recDate').value=todayStr(); renderRecs(); renderPins();
+}
+function saveCfg(){ return fbPut('emn_presencas_cfg', cfg); }
+
+function renderPools(){
+  var h='';
+  POOLS.forEach(function(p){
+    var c=cfg.pools[p.id];
+    var co = (c && c.lat!=null) ? (c.lat.toFixed(5)+', '+c.lng.toFixed(5)) : 'sem coordenadas';
+    h+='<div class="poolrow"><div><div class="nm">'+esc(p.name)+'</div><div class="co">'+co+'</div></div>'+
+       '<div style="display:flex;flex-direction:column;gap:5px"><button data-cap="'+p.id+'">📍 Capturar aqui</button>'+
+       '<button data-man="'+p.id+'" style="background:var(--g4)">✎ Manual</button></div></div>';
+  });
+  $('poolList').innerHTML=h;
+  $('poolList').querySelectorAll('[data-cap]').forEach(function(b){ b.onclick=function(){ captureHere(b.getAttribute('data-cap')); }; });
+  $('poolList').querySelectorAll('[data-man]').forEach(function(b){ b.onclick=function(){ manualCoords(b.getAttribute('data-man')); }; });
+}
+function captureHere(id){
+  if(!navigator.geolocation){ alert('GPS indisponível.'); return; }
+  var b=event&&event.target; if(b) b.textContent='…';
+  navigator.geolocation.getCurrentPosition(function(pos){
+    cfg.pools[id]={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:pos.coords.accuracy};
+    saveCfg().then(function(){ renderPools(); alert('Coordenadas de '+poolName(id)+' guardadas (precisão ±'+Math.round(pos.coords.accuracy)+' m).'); });
+  }, function(){ alert('Não foi possível obter a localização.'); renderPools(); }, {enableHighAccuracy:true,timeout:15000,maximumAge:0});
+}
+function manualCoords(id){
+  var cur=cfg.pools[id]||{};
+  var v=prompt('Coordenadas de '+poolName(id)+'\nCola do Google Maps no formato: latitude, longitude', (cur.lat!=null?cur.lat+', '+cur.lng:''));
+  if(v==null) return;
+  var m=v.split(',');
+  var lat=parseFloat(m[0]), lng=parseFloat(m[1]);
+  if(isNaN(lat)||isNaN(lng)){ alert('Formato inválido.'); return; }
+  cfg.pools[id]={lat:lat,lng:lng,acc:null};
+  saveCfg().then(renderPools);
+}
+function renderRecs(){
+  var date=$('recDate').value||todayStr();
+  $('recList').innerHTML='<div class="mini">A carregar…</div>';
+  var all=[];
+  Promise.all(POOLS.map(function(p){
+    return fbGet('emn_presencas/'+p.id+'/'+date).then(function(recs){
+      if(recs) Object.keys(recs).forEach(function(id){ var r=recs[id]; r._key=id; all.push(r); });
+    }).catch(function(){});
+  })).then(function(){
+    window.__recs=all; window.__recDate=date;
+    if(!all.length){ $('recList').innerHTML='<div class="mini">Sem registos neste dia.</div>'; return; }
+    all.sort(function(a,b){ return (a.entrada||'').localeCompare(b.entrada||''); });
+    var h='';
+    all.forEach(function(r,i){
+      var dur='';
+      if(r.saida){ var mins=Math.round((new Date(r.saida)-new Date(r.entrada))/60000); dur=Math.floor(mins/60)+'h'+pad(mins%60); }
+      h+='<div class="rec"><div class="r1"><span>'+esc(r.nome)+'</span><span class="badge '+(r.saida?'clo':'open')+'">'+(r.saida?'fechado':'em curso')+'</span></div>'+
+         '<div class="r2">'+esc(poolName(r.pool))+' · Entrada '+esc(r.entradaHora)+(r.saida?(' → Saída '+esc(r.saidaHora)+' · '+dur):'')+'</div>'+
+         '<div style="display:flex;gap:6px;margin-top:8px">'+
+           '<button data-ed="'+i+'" style="flex:1;padding:7px;border:none;border-radius:8px;background:var(--bp);color:#fff;font-weight:700;font-size:.75rem;cursor:pointer">✎ Editar</button>'+
+           '<button data-dl="'+i+'" style="flex:1;padding:7px;border:none;border-radius:8px;background:var(--rd);color:#fff;font-weight:700;font-size:.75rem;cursor:pointer">🗑 Eliminar</button>'+
+         '</div></div>';
+    });
+    $('recList').innerHTML=h;
+    $('recList').querySelectorAll('[data-ed]').forEach(function(b){ b.onclick=function(){ openRecForm(all[+b.getAttribute('data-ed')]); }; });
+    $('recList').querySelectorAll('[data-dl]').forEach(function(b){ b.onclick=function(){ var r=all[+b.getAttribute('data-dl')]; deleteRec(r.pool,r.date,r.id||r._key,r.nome); }; });
+  });
+}
+function fillRfPool(){ var s=$('rfPool'); s.innerHTML=''; POOLS.forEach(function(p){ s.insertAdjacentHTML('beforeend','<option value="'+p.id+'">'+esc(p.name)+'</option>'); }); }
+function fillRfProf(){
+  var s=$('rfProf'); s.innerHTML='';
+  professors.forEach(function(p){ s.insertAdjacentHTML('beforeend','<option value="'+esc(p.key)+'">'+esc(p.nome)+'</option>'); });
+  if(!professors.length) s.innerHTML='<option value="">(sem professores na base de dados)</option>';
+}
+function openRecForm(rec){
+  fillRfPool(); fillRfProf();
+  if(rec){
+    editingRef={pool:rec.pool,date:rec.date,id:rec.id||rec._key};
+    $('recFormTitle').textContent='Editar presença';
+    $('rfPool').value=rec.pool;
+    if(rec.profKey && !professors.some(function(p){return p.key===rec.profKey;})){ $('rfProf').insertAdjacentHTML('beforeend','<option value="'+esc(rec.profKey)+'">'+esc(rec.nome||rec.profKey)+'</option>'); }
+    $('rfProf').value=rec.profKey||'';
+    $('rfDate').value=rec.date;
+    $('rfIn').value=rec.entradaHora||'';
+    $('rfOut').value=rec.saidaHora||'';
+  } else {
+    editingRef=null;
+    $('recFormTitle').textContent='Nova presença';
+    $('rfPool').value=POOLS[0].id;
+    $('rfDate').value=$('recDate').value||todayStr();
+    $('rfIn').value=''; $('rfOut').value='';
+  }
+  $('recForm').classList.remove('hidden');
+}
+function saveRecForm(){
+  var pool=$('rfPool').value, pk=$('rfProf').value, date=$('rfDate').value, tin=$('rfIn').value, tout=$('rfOut').value;
+  if(!pk){ alert('Escolhe o professor.'); return; }
+  if(!date || !tin){ alert('Data e hora de entrada são obrigatórias.'); return; }
+  var prof=professors.filter(function(p){return p.key===pk;})[0];
+  var nome=prof?prof.nome:pk;
+  var id = editingRef ? editingRef.id : ('r'+Date.now()+'_'+Math.floor(Math.random()*1000));
+  var rec={ id:id, profKey:pk, nome:nome, pool:pool, poolName:poolName(pool), date:date,
+    entrada:new Date(date+'T'+tin+':00').toISOString(), entradaHora:tin, entradaLat:null, entradaLng:null, entradaDist:null, entradaAcc:null,
+    saida:null, saidaHora:null, saidaLat:null, saidaLng:null, saidaDist:null, saidaAcc:null };
+  if(tout){ rec.saida=new Date(date+'T'+tout+':00').toISOString(); rec.saidaHora=tout; }
+  fbPut('emn_presencas/'+pool+'/'+date+'/'+id, rec).then(function(){
+    if(editingRef && (editingRef.pool!==pool || editingRef.date!==date)){
+      return fetch(CLOUD+'/emn_presencas/'+editingRef.pool+'/'+editingRef.date+'/'+editingRef.id+'.json',{method:'DELETE'});
+    }
+  }).then(function(){ $('recForm').classList.add('hidden'); editingRef=null; renderRecs(); })
+  .catch(function(e){ alert('Erro ao guardar: '+e.message); });
+}
+function deleteRec(pool,date,id,nome){
+  if(!confirm('Eliminar a presença de '+nome+'?\nEsta ação não pode ser anulada.')) return;
+  fetch(CLOUD+'/emn_presencas/'+pool+'/'+date+'/'+id+'.json',{method:'DELETE'})
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); renderRecs(); })
+    .catch(function(e){ alert('Erro ao eliminar: '+e.message); });
+}
+function exportCsv(){
+  var all=window.__recs||[], date=window.__recDate||todayStr();
+  if(!all.length){ alert('Sem registos para exportar.'); return; }
+  var rows=[['Data','Piscina','Professor','Entrada','Saida','Duracao','Dist.Entrada(m)','Dist.Saida(m)']];
+  all.forEach(function(r){
+    var dur='';
+    if(r.saida){ var mins=Math.round((new Date(r.saida)-new Date(r.entrada))/60000); dur=Math.floor(mins/60)+'h'+pad(mins%60); }
+    rows.push([r.date,poolName(r.pool),r.nome,r.entradaHora||'',r.saidaHora||'',dur,r.entradaDist||'',r.saidaDist!=null?r.saidaDist:'']);
+  });
+  var csv=rows.map(function(row){ return row.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(';'); }).join('\n');
+  var blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='presencas_'+date+'.csv'; a.click();
+}
+function renderPins(){
+  var keys=Object.keys(pins);
+  if(!keys.length){ $('pinList').innerHTML='<div class="mini">Nenhum PIN definido ainda.</div>'; return; }
+  var byName={}; professors.forEach(function(p){ byName[p.key]=p.nome; });
+  var h='';
+  keys.forEach(function(k){
+    h+='<div class="poolrow"><div class="nm">'+esc(byName[k]||k)+'</div><button data-del="'+esc(k)+'" style="background:var(--rd)">Apagar PIN</button></div>';
+  });
+  $('pinList').innerHTML=h;
+  $('pinList').querySelectorAll('[data-del]').forEach(function(b){ b.onclick=function(){
+    var k=b.getAttribute('data-del');
+    if(!confirm('Apagar o PIN de '+(byName[k]||k)+'? Poderá definir um novo na próxima marcação.')) return;
+    delete pins[k];
+    fbPut('emn_pins', pins).then(function(){ renderPins(); }).catch(function(){ fetch(CLOUD+'/emn_pins/'+k+'.json',{method:'DELETE'}).then(function(){renderPins();}); });
+  }; });
+}
+function switchAdminTab(at){
+  ['geo','recs','planos','pins','cfg'].forEach(function(t){ $('at'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('hidden', t!==at); });
+  document.querySelectorAll('.tt button').forEach(function(b){ b.classList.toggle('act', b.getAttribute('data-at')===at); });
+  if(at==='recs') renderRecs();
+  if(at==='pins') renderPins();
+  if(at==='planos') renderAdmPlanos();
+}
+
+/* ═══════════ PLANOS DE AULA ═══════════ */
+function nivelNome(id){ for(var i=0;i<PLANO_NIVEIS.length;i++) if(PLANO_NIVEIS[i].id===id) return PLANO_NIVEIS[i].nome; return id; }
+function fmtD(s){ if(!s) return '—'; var p=String(s).split('-'); return p.length===3?(p[2]+'/'+p[1]+'/'+p[0]):s; }
+function showTab(name){
+  curTab=name;
+  $('eximOverlay').classList.add('hidden');
+  $('viewProf').classList.toggle('hidden', name!=='pres');
+  $('viewPlanos').classList.toggle('hidden', name!=='planos');
+  $('viewBiblio').classList.toggle('hidden', name!=='biblio');
+  $('viewPlanoForm').classList.add('hidden');
+  $('viewExForm').classList.add('hidden');
+  $('viewAdmin').classList.add('hidden');
+  $('navPres').classList.toggle('act', name==='pres');
+  $('navPlanos').classList.toggle('act', name==='planos');
+  $('navBiblio').classList.toggle('act', name==='biblio');
+  if(name==='planos') loadPlanos();
+  if(name==='biblio') loadExercicios();
+}
+function loadPlanos(){
+  $('planoList').innerHTML='<div class="mini">A carregar…</div>';
+  fbGet('emn_planos').then(function(d){
+    planos=[]; if(d) Object.keys(d).forEach(function(k){ var p=d[k]; p._key=k; planos.push(p); });
+    planos.sort(function(a,b){ return (b.criadoEm||'').localeCompare(a.criadoEm||''); });
+    renderPlanoList();
+  }).catch(function(){ $('planoList').innerHTML='<div class="mini">Sem planos ou sem ligação à cloud.</div>'; });
+}
+function estadoLabel(s){ return s==='aprovado'?'Aprovado':(s==='devolvido'?'Devolvido':'Pendente'); }
+function acaoLabel(a){ return {criado:'Criado',editado:'Editado',aprovado:'Aprovado',devolvido:'Devolvido'}[a]||a; }
+function fmtDT(iso){ if(!iso) return '—'; var d=new Date(iso); return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes()); }
+function nl2br(s){ return esc(s).replace(/\n/g,'<br>'); }
+function planoHist(p){
+  if(p.historico && p.historico.length) return p.historico;
+  var h=[];
+  if(p.criadoEm) h.push({acao:'criado', quem:p.criadoPorNome||'—', quando:p.criadoEm});
+  if(p.atualizadoEm && p.atualizadoEm!==p.criadoEm) h.push({acao:'editado', quem:p.criadoPorNome||'—', quando:p.atualizadoEm});
+  return h;
+}
+function ultimaEdicao(p){
+  var hist=planoHist(p); if(!hist.length) return '';
+  var last=hist[hist.length-1];
+  return acaoLabel(last.acao)+' por '+last.quem+' · '+fmtDT(last.quando);
+}
+function historyHTML(p){
+  var hist=planoHist(p); if(!hist.length) return '';
+  var h='<div class="hist"><b>Registo de alterações:</b><br>';
+  hist.forEach(function(x){ h+='• '+esc(acaoLabel(x.acao))+' — '+esc(x.quem)+' · '+esc(fmtDT(x.quando))+'<br>'; });
+  return h+'</div>';
+}
+function planoDetailHTML(p){
+  var h='<table><tr><th>#</th><th>Conteúdo</th><th>Descrição</th><th>Critérios de êxito</th><th>Erros comuns</th><th>Feedbacks</th></tr>';
+  (p.exercicios||[]).forEach(function(e,i){ h+='<tr><td>'+(i+1)+'</td><td>'+esc(e.conteudo)+'</td><td>'+nl2br(e.descricao)+'</td><td>'+nl2br(e.criterios)+'</td><td>'+nl2br(e.erros)+'</td><td>'+nl2br(e.feedback)+'</td></tr>'; });
+  h+='</table>'; return h;
+}
+function planoHeadHTML(p){
+  var stc=p.estado==='aprovado'?'aprov':(p.estado==='devolvido'?'devol':'pend');
+  var ult=ultimaEdicao(p);
+  return '<div class="ph"><div><div class="pt">'+esc(nivelNome(p.nivel))+' · Plano nº '+esc(p.numPlano)+'</div>'+
+    '<div class="pm">📅 '+esc(fmtD(p.dataDe))+' a '+esc(fmtD(p.dataAte))+'<br>👥 '+esc((p.grupo||[]).join(', ')||'—')+'<br>✍ '+esc(p.criadoPorNome||'—')+
+    (ult?('<br>🕓 '+esc(ult)):'')+'</div></div>'+
+    '<span class="st '+stc+'">'+esc(estadoLabel(p.estado))+'</span></div>';
+}
+function renderNivelBar(){
+  var h='<button data-nf="todos" class="'+(planoFilter==='todos'?'act':'')+'">Todos</button>';
+  NIVEL_ORDER.forEach(function(id){ h+='<button data-nf="'+id+'" class="'+(planoFilter===id?'act':'')+'">'+esc(nivelNome(id))+'</button>'; });
+  $('nivelBar').innerHTML=h;
+  $('nivelBar').querySelectorAll('[data-nf]').forEach(function(b){ b.onclick=function(){ planoFilter=b.getAttribute('data-nf'); renderNivelBar(); renderPlanoList(); }; });
+}
+function renderPlanoList(){
+  renderNivelBar();
+  var list=planos.filter(function(p){ return planoFilter==='todos' || p.nivel===planoFilter; });
+  if(!list.length){ $('planoList').innerHTML='<div class="mini">'+(planos.length?'Sem planos neste nível.':'Ainda não há planos. Cria o primeiro com “＋ Novo plano de aula”.')+'</div>'; return; }
+  var h='';
+  list.forEach(function(p){
+    var i=planos.indexOf(p);
+    h+='<div class="pcard">'+planoHeadHTML(p);
+    if(p.estado==='devolvido' && p.notaCoord) h+='<div class="note2">↩ Nota da coordenação: '+esc(p.notaCoord)+'</div>';
+    h+='<div class="pact">'+
+       '<button data-pv="'+i+'" style="background:var(--g4)">👁 Ver</button>'+
+       '<button data-pe="'+i+'" style="background:var(--bp)">✎ Editar</button>'+
+       '<button data-pp="'+i+'" style="background:var(--rd)">⬇ PDF</button>'+
+       '<button data-px="'+i+'" style="background:var(--gn)">⬇ Excel</button>'+
+       '</div><div id="pdet'+i+'" class="pdet" style="display:none;margin-top:10px;"></div></div>';
+  });
+  $('planoList').innerHTML=h;
+  $('planoList').querySelectorAll('[data-pv]').forEach(function(b){ b.onclick=function(){ var i=+b.getAttribute('data-pv'); var el=$('pdet'+i); if(el.style.display==='none'){ el.innerHTML=planoDetailHTML(planos[i])+historyHTML(planos[i]); el.style.display='block'; } else el.style.display='none'; }; });
+  $('planoList').querySelectorAll('[data-pe]').forEach(function(b){ b.onclick=function(){ openPlanoForm(planos[+b.getAttribute('data-pe')],'prof'); }; });
+  $('planoList').querySelectorAll('[data-pp]').forEach(function(b){ b.onclick=function(){ exportPlanoPDF(planos[+b.getAttribute('data-pp')]); }; });
+  $('planoList').querySelectorAll('[data-px]').forEach(function(b){ b.onclick=function(){ exportPlanoXLSX(planos[+b.getAttribute('data-px')]); }; });
+}
+function fillPfNivel(){ var s=$('pfNivel'); s.innerHTML=''; PLANO_NIVEIS.forEach(function(n){ s.insertAdjacentHTML('beforeend','<option value="'+n.id+'">'+esc(n.nome)+'</option>'); }); }
+function fillPfNum(){ var s=$('pfNum'); s.innerHTML=''; for(var i=1;i<=30;i++) s.insertAdjacentHTML('beforeend','<option value="'+i+'">'+i+'</option>'); }
+function fillPfProf(limitNames){
+  var s=$('pfProf'); s.innerHTML='<option value="">— seleciona —</option>';
+  professors.forEach(function(p){ if(limitNames && limitNames.indexOf(p.nome)<0) return; s.insertAdjacentHTML('beforeend','<option value="'+esc(p.key)+'">'+esc(p.nome)+'</option>'); });
+}
+function renderPfGrupo(){
+  var h=''; professors.forEach(function(pr){ h+='<span class="chip'+(pfGrupoSel[pr.nome]?' on':'')+'" data-g="'+esc(pr.nome)+'">'+esc(pr.nome)+'</span>'; });
+  if(!professors.length) h='<span class="mini">Sem professores na base de dados.</span>';
+  $('pfGrupo').innerHTML=h;
+  $('pfGrupo').querySelectorAll('[data-g]').forEach(function(c){ c.onclick=function(){ var n=c.getAttribute('data-g'); if(pfGrupoSel[n]) delete pfGrupoSel[n]; else pfGrupoSel[n]=true; c.classList.toggle('on'); }; });
+}
+function renderPfExs(){
+  var niv=$('pfNivel').value, opts=CONTEUDOS[niv], h='';
+  pfExsData.forEach(function(e,i){
+    h+='<div class="exrow"><div class="exh"><span class="exn">Exercício '+(i+1)+'</span><button class="exdel" data-x="'+i+'">✕ remover</button></div>';
+    h+='<label>Conteúdo</label>';
+    if(opts){
+      h+='<select data-f="conteudo" data-i="'+i+'"><option value="">— selecionar —</option>';
+      opts.forEach(function(o){ h+='<option value="'+esc(o)+'"'+(e.conteudo===o?' selected':'')+'>'+esc(o)+'</option>'; });
+      h+='</select>';
+    } else {
+      h+='<input data-f="conteudo" data-i="'+i+'" value="'+esc(e.conteudo)+'" placeholder="Escrever o conteúdo">';
+    }
+    h+='<label>Descrição</label><textarea data-f="descricao" data-i="'+i+'">'+esc(e.descricao)+'</textarea>';
+    h+='<label>Critérios de êxito</label><textarea data-f="criterios" data-i="'+i+'">'+esc(e.criterios)+'</textarea>';
+    h+='<label>Erros comuns</label><textarea data-f="erros" data-i="'+i+'">'+esc(e.erros)+'</textarea>';
+    h+='<label>Feedbacks</label><textarea data-f="feedback" data-i="'+i+'">'+esc(e.feedback)+'</textarea>';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-top:10px;"><button class="exsave" data-sv="'+i+'">💾 Guardar exercício na biblioteca</button><span class="exsvmsg" id="exsvmsg'+i+'"></span></div>';
+    h+='</div>';
+  });
+  $('pfExs').innerHTML=h;
+  $('pfExs').querySelectorAll('[data-f]').forEach(function(el){ el.oninput=el.onchange=function(){ pfExsData[+el.getAttribute('data-i')][el.getAttribute('data-f')]=el.value; }; });
+  $('pfExs').querySelectorAll('[data-x]').forEach(function(b){ b.onclick=function(){ pfExsData.splice(+b.getAttribute('data-x'),1); if(!pfExsData.length) pfExsData.push({conteudo:'',descricao:'',criterios:'',erros:'',feedback:''}); renderPfExs(); }; });
+  $('pfExs').querySelectorAll('[data-sv]').forEach(function(b){ b.onclick=function(){ saveExFromPlanoRow(+b.getAttribute('data-sv')); }; });
+}
+function saveExFromPlanoRow(i){
+  var niv=$('pfNivel').value, e=pfExsData[i], msgEl=$('exsvmsg'+i);
+  if(!e || !((e.conteudo||'').trim() || (e.descricao||'').trim())){ msgEl.textContent='Preenche conteúdo ou descrição primeiro.'; msgEl.className='exsvmsg err'; return; }
+  var quem='—';
+  if(pfMode==='admin'){ quem='Coordenação'; }
+  else { var pk=$('pfProf').value; var prof=professors.filter(function(p){return p.key===pk;})[0]; if(prof) quem=prof.nome; }
+  msgEl.textContent='A guardar…'; msgEl.className='exsvmsg';
+  fbGet('emn_exercicios').then(function(ex){
+    ex=ex||{};
+    var s=exSig(niv,e.conteudo,e.descricao), dup=false;
+    Object.keys(ex).forEach(function(k){ var x=ex[k]; if(exSig(x.nivel,x.conteudo,x.descricao)===s) dup=true; });
+    if(dup){ msgEl.textContent='ℹ Já está na biblioteca.'; msgEl.className='exsvmsg info'; return; }
+    return insertExercicios([{nivel:niv, conteudo:e.conteudo, descricao:e.descricao, criterios:e.criterios, erros:e.erros, feedback:e.feedback, criadoPorKey:(pfMode==='admin'?null:$('pfProf').value)||null, criadoPorNome:quem}]).then(function(){
+      msgEl.textContent='✅ Guardado em '+nivelNome(niv)+(e.conteudo?(' · '+e.conteudo):''); msgEl.className='exsvmsg ok';
+    });
+  }).catch(function(err){ msgEl.textContent='Erro: '+err.message; msgEl.className='exsvmsg err'; });
+}
+function openPlanoForm(p, mode){
+  pfMode = mode||'prof';
+  $('viewProf').classList.add('hidden'); $('viewPlanos').classList.add('hidden'); $('viewAdmin').classList.add('hidden');
+  $('viewPlanoForm').classList.remove('hidden');
+  fillPfNivel(); fillPfNum();
+  $('pfStatus').className='status';
+  // submissor: visível só no modo professor
+  $('pfSubmitter').style.display = (pfMode==='admin') ? 'none' : 'block';
+  if(p){
+    pfEditId=p._key||p.id;
+    $('pfTitle').textContent = (pfMode==='admin') ? 'Editar plano (coordenação)' : 'Editar plano de aula';
+    $('pfProfLbl').textContent='Editado por';
+    $('pfNivel').value=p.nivel; $('pfNum').value=p.numPlano;
+    $('pfDe').value=p.dataDe; $('pfAte').value=p.dataAte;
+    pfGrupoSel={}; (p.grupo||[]).forEach(function(n){ pfGrupoSel[n]=true; });
+    pfExsData=(p.exercicios||[]).map(function(e){ return {conteudo:e.conteudo||'',descricao:e.descricao||'',criterios:e.criterios||'',erros:e.erros||'',feedback:e.feedback||''}; });
+    if(!pfExsData.length) pfExsData=[{conteudo:'',descricao:'',criterios:'',erros:'',feedback:''}];
+    // só professores do grupo podem editar → limitar seleção
+    fillPfProf(p.grupo||[]);
+  } else {
+    pfEditId=null;
+    $('pfTitle').textContent='Novo plano de aula';
+    $('pfProfLbl').textContent='Submetido por';
+    $('pfNivel').value = (planoFilter!=='todos'?planoFilter:'ini'); $('pfNum').value='1';
+    $('pfDe').value=''; $('pfAte').value='';
+    pfGrupoSel={}; pfExsData=[{conteudo:'',descricao:'',criterios:'',erros:'',feedback:''}];
+    fillPfProf(null);
+  }
+  renderPfGrupo(); renderPfExs(); $('pfPin').value=''; $('pfSaveAllMsg').textContent='';
+}
+function pfStatus(cls,msg){ var s=$('pfStatus'); s.className='status show '+cls; s.innerHTML=msg; }
+function backFromForm(){
+  if(pfMode==='admin'){ $('viewPlanoForm').classList.add('hidden'); $('viewAdmin').classList.remove('hidden'); switchAdminTab('planos'); }
+  else showTab('planos');
+}
+function submitPlano(){
+  var niv=$('pfNivel').value, num=$('pfNum').value, de=$('pfDe').value, ate=$('pfAte').value;
+  var grupo=Object.keys(pfGrupoSel);
+  if(!de||!ate){ pfStatus('errm','Indica o período (de / até).'); return; }
+  if(ate<de){ pfStatus('errm','A data final não pode ser anterior à inicial.'); return; }
+  if(!grupo.length){ pfStatus('errm','Seleciona pelo menos um professor no grupo.'); return; }
+  var exs=pfExsData.filter(function(e){ return (e.conteudo||e.descricao||e.criterios||e.erros||e.feedback||'').trim(); });
+  if(!exs.length){ pfStatus('errm','Adiciona pelo menos um exercício.'); return; }
+  var id=pfEditId||('p'+Date.now()+'_'+Math.floor(Math.random()*1000));
+  var existing=planos.filter(function(p){return (p._key||p.id)===id;})[0];
+  var now=new Date().toISOString();
+  var quemNome, firstTime=false, pk=null;
+
+  if(pfMode==='admin'){
+    quemNome='Coordenação';
+  } else {
+    pk=$('pfProf').value; var pin=$('pfPin').value.trim();
+    if(!pk){ pfStatus('errm','Indica quem submete o plano.'); return; }
+    // permissão: em edição, só professores do grupo
+    var prof=professors.filter(function(p){return p.key===pk;})[0];
+    quemNome=prof?prof.nome:pk;
+    if(pfEditId && grupo.indexOf(quemNome)<0){ pfStatus('errm','Apenas professores do grupo (ou a coordenação) podem editar este plano.'); return; }
+    if(!/^\d{4,6}$/.test(pin)){ pfStatus('errm','Introduz o teu PIN (4 a 6 dígitos).'); return; }
+    var stp=checkPin(pk,pin);
+    if(stp==='wrong'){ pfStatus('errm','PIN incorreto.'); return; }
+    firstTime=(stp==='set');
+  }
+
+  var hist=(existing&&existing.historico)?existing.historico.slice():[];
+  hist.push({acao: pfEditId?'editado':'criado', quem:quemNome, quando:now});
+
+  // estado: professor submete/re-submete → pendente; coordenação mantém estado atual
+  var estado = (pfMode==='admin' && existing) ? existing.estado : 'pendente';
+  var nota   = (pfMode==='admin' && existing) ? (existing.notaCoord||'') : '';
+
+  var rec={ id:id, nivel:niv, nivelNome:nivelNome(niv), numPlano:num, dataDe:de, dataAte:ate,
+    grupo:grupo, exercicios:exs,
+    criadoPorKey: existing?existing.criadoPorKey:(pk||null), criadoPorNome: existing?existing.criadoPorNome:quemNome,
+    criadoEm: (existing&&existing.criadoEm)?existing.criadoEm:now, atualizadoEm:now,
+    estado:estado, notaCoord:nota, decididoEm: existing?(existing.decididoEm||null):null,
+    historico:hist };
+
+  pfStatus('info','A guardar…');
+  var savePin=firstTime?fbPut('emn_pins/'+pk,hashPin($('pfPin').value.trim())).then(function(){pins[pk]=hashPin($('pfPin').value.trim());}):Promise.resolve();
+  savePin.then(function(){ return fbPut('emn_planos/'+id, rec); }).then(function(){
+    autoLibFromPlano(rec);
+    pfStatus('done', pfMode==='admin'?'✅ Plano atualizado.':'✅ Plano submetido para aprovação.');
+    setTimeout(backFromForm, 800);
+  }).catch(function(e){ pfStatus('errm','Erro ao guardar: '+e.message); });
+}
+function renderAdmPlanos(){
+  $('admPlanoList').innerHTML='<div class="mini">A carregar…</div>';
+  fbGet('emn_planos').then(function(d){
+    var arr=[]; if(d) Object.keys(d).forEach(function(k){ var p=d[k]; p._key=k; arr.push(p); });
+    var order={pendente:0,devolvido:1,aprovado:2};
+    arr.sort(function(a,b){ return (order[a.estado]-order[b.estado]) || (b.criadoEm||'').localeCompare(a.criadoEm||''); });
+    if(!arr.length){ $('admPlanoList').innerHTML='<div class="mini">Sem planos submetidos.</div>'; return; }
+    var h='';
+    arr.forEach(function(p,i){
+      h+='<div class="pcard">'+planoHeadHTML(p)+'<div class="pdet" style="margin-top:8px;">'+planoDetailHTML(p)+'</div>'+historyHTML(p);
+      if(p.estado==='devolvido' && p.notaCoord) h+='<div class="note2">↩ '+esc(p.notaCoord)+'</div>';
+      h+='<div class="pact">'+
+         '<button data-ap="'+i+'" style="background:var(--gn)">✔ Aprovar</button>'+
+         '<button data-dv="'+i+'" style="background:var(--or)">↩ Devolver</button>'+
+         '<button data-ed="'+i+'" style="background:var(--bp)">✎ Editar</button>'+
+         '<button data-pp="'+i+'" style="background:var(--bd)">⬇ PDF</button>'+
+         '<button data-xx="'+i+'" style="background:var(--aq)">⬇ Excel</button>'+
+         '<button data-px="'+i+'" style="background:var(--rd)">🗑 Eliminar</button></div></div>';
+    });
+    $('admPlanoList').innerHTML=h;
+    $('admPlanoList').querySelectorAll('[data-ap]').forEach(function(b){ b.onclick=function(){ decidePlano(arr[+b.getAttribute('data-ap')],'aprovado'); }; });
+    $('admPlanoList').querySelectorAll('[data-dv]').forEach(function(b){ b.onclick=function(){ decidePlano(arr[+b.getAttribute('data-dv')],'devolvido'); }; });
+    $('admPlanoList').querySelectorAll('[data-ed]').forEach(function(b){ b.onclick=function(){ openPlanoForm(arr[+b.getAttribute('data-ed')],'admin'); }; });
+    $('admPlanoList').querySelectorAll('[data-pp]').forEach(function(b){ b.onclick=function(){ exportPlanoPDF(arr[+b.getAttribute('data-pp')]); }; });
+    $('admPlanoList').querySelectorAll('[data-xx]').forEach(function(b){ b.onclick=function(){ exportPlanoXLSX(arr[+b.getAttribute('data-xx')]); }; });
+    $('admPlanoList').querySelectorAll('[data-px]').forEach(function(b){ b.onclick=function(){ delPlano(arr[+b.getAttribute('data-px')]); }; });
+  }).catch(function(){ $('admPlanoList').innerHTML='<div class="mini">Sem ligação à cloud.</div>'; });
+}
+function decidePlano(p,estado){
+  var nota='';
+  if(estado==='devolvido'){ nota=prompt('Nota para o professor (motivo da devolução):', p.notaCoord||''); if(nota==null) return; }
+  var id=p._key||p.id, clean={};
+  Object.keys(p).forEach(function(k){ if(k!=='_key') clean[k]=p[k]; });
+  var now=new Date().toISOString();
+  clean.estado=estado; clean.notaCoord=(estado==='devolvido')?nota:''; clean.decididoEm=now;
+  clean.historico=(clean.historico||[]).concat({acao:estado, quem:'Coordenação', quando:now});
+  fbPut('emn_planos/'+id, clean).then(function(){ renderAdmPlanos(); }).catch(function(e){ alert('Erro: '+e.message); });
+}
+function delPlano(p){
+  if(!confirm('Eliminar definitivamente este plano de aula?')) return;
+  var id=p._key||p.id;
+  fetch(CLOUD+'/emn_planos/'+id+'.json',{method:'DELETE'}).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); renderAdmPlanos(); }).catch(function(e){ alert('Erro ao eliminar: '+e.message); });
+}
+
+/* ═══════════ EXPORTAR PLANO (PDF / EXCEL) ═══════════ */
+function epocaAtual(){ var d=new Date(), m=d.getMonth()+1, y=d.getFullYear(); var s=(m>=8)?y:y-1; return s+'/'+(s+1); }
+function planoLogo(){ var el=document.querySelector('.hd img'); return el?el.src:''; }
+function buildPlanoBody(p){
+  var h='<h3>Informação</h3><table>';
+  h+='<tr><td><strong>Nível</strong></td><td>'+esc(nivelNome(p.nivel))+'</td></tr>';
+  h+='<tr><td><strong>Nº do plano</strong></td><td>'+esc(p.numPlano)+'</td></tr>';
+  h+='<tr><td><strong>Período</strong></td><td>'+esc(fmtD(p.dataDe))+' a '+esc(fmtD(p.dataAte))+'</td></tr>';
+  h+='<tr><td><strong>Grupo</strong></td><td>'+esc((p.grupo||[]).join(', ')||'—')+'</td></tr>';
+  h+='<tr><td><strong>Estado</strong></td><td>'+esc(estadoLabel(p.estado))+'</td></tr>';
+  h+='</table>';
+  h+='<h3>Exercícios</h3><table><tr><th>#</th><th>Conteúdo</th><th>Descrição</th><th>Critérios de êxito</th><th>Erros comuns</th><th>Feedbacks</th></tr>';
+  (p.exercicios||[]).forEach(function(e,i){ h+='<tr><td>'+(i+1)+'</td><td>'+esc(e.conteudo)+'</td><td>'+nl2br(e.descricao)+'</td><td>'+nl2br(e.criterios)+'</td><td>'+nl2br(e.erros)+'</td><td>'+nl2br(e.feedback)+'</td></tr>'; });
+  h+='</table>';
+  var hist=planoHist(p);
+  if(hist.length){
+    h+='<h3>Registo de alterações</h3><table><tr><th>Ação</th><th>Por</th><th>Data e hora</th></tr>';
+    hist.forEach(function(x){ h+='<tr><td>'+esc(acaoLabel(x.acao))+'</td><td>'+esc(x.quem)+'</td><td>'+esc(fmtDT(x.quando))+'</td></tr>'; });
+    h+='</table>';
+  }
+  return h;
+}
+function exportPlanoPDF(p){
+  var title='Plano de Aula — '+nivelNome(p.nivel)+' · nº '+p.numPlano;
+  var sub=esc(nivelNome(p.nivel))+' &middot; Época '+epocaAtual();
+  var logoSrc=planoLogo();
+  var body=buildPlanoBody(p);
+  var win=window.open('','_blank');
+  if(!win){ alert('O navegador bloqueou a janela. Permite pop-ups para exportar em PDF.'); return; }
+  win.document.write(
+    '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+esc(title)+'</title>'+
+    '<style>'+
+    '*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}'+
+    'body{font-family:Arial,sans-serif;padding:1.2rem;color:#1a2332;margin:0;}'+
+    '.pdf-header{display:flex;align-items:center;gap:1rem;border-bottom:3px solid #00acc1;padding-bottom:.85rem;margin-bottom:1rem;}'+
+    '.pdf-header img{height:55px;background:#fff;border-radius:6px;padding:3px;flex-shrink:0;}'+
+    '.pdf-header-text{flex:1;}'+
+    '.pdf-header h1{color:#0a3d6b;font-size:1.35rem;margin:0;font-weight:700;}'+
+    '.pdf-header h2{color:#1565c0;font-size:1rem;margin:.15rem 0 0;font-weight:500;}'+
+    'h3{color:#0a3d6b;margin-top:1.4rem;border-bottom:1.5px solid #e8ecf1;padding-bottom:.35rem;font-size:1.05rem;}'+
+    'table{width:100%;border-collapse:collapse;margin:.85rem 0;font-size:.8rem;}'+
+    'th{background:#0a3d6b !important;color:#fff !important;padding:.5rem;text-align:left;border:1px solid #1565c0;}'+
+    'td{padding:.4rem;border:1px solid #ddd;vertical-align:top;background:#fff;}'+
+    'tr:nth-child(even) td{background:#f7f9fc;}'+
+    '.sub{font-size:.8rem;color:#555;margin-bottom:.5rem;}'+
+    '@media print{body{padding:.5rem;}@page{size:A4;margin:1cm;}}'+
+    '</style></head><body>'+
+    '<div class="pdf-header">'+(logoSrc?'<img src="'+logoSrc+'" alt="CMF">':'')+
+    '<div class="pdf-header-text"><h1>Escola Municipal de Natação de Felgueiras</h1><h2>'+esc(title)+'</h2></div></div>'+
+    '<div class="sub">'+sub+'</div>'+
+    body+
+    '<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print();},250);}</scr'+'ipt></body></html>'
+  );
+  win.document.close();
+}
+function exportPlanoXLSX(p){
+  if(typeof XLSX==='undefined'){ alert('A biblioteca de Excel ainda está a carregar. Tenta novamente daqui a uns segundos.'); return; }
+  var aoa=[];
+  aoa.push(['Escola Municipal de Natação de Felgueiras']);
+  aoa.push(['Plano de Aula — '+nivelNome(p.nivel)+' · nº '+p.numPlano]);
+  aoa.push(['Época '+epocaAtual()]);
+  aoa.push([]);
+  aoa.push(['Nível', nivelNome(p.nivel)]);
+  aoa.push(['Nº do plano', p.numPlano]);
+  aoa.push(['Período', fmtD(p.dataDe)+' a '+fmtD(p.dataAte)]);
+  aoa.push(['Grupo', (p.grupo||[]).join(', ')]);
+  aoa.push(['Estado', estadoLabel(p.estado)]);
+  aoa.push([]);
+  aoa.push(['#','Conteúdo','Descrição','Critérios de êxito','Erros comuns','Feedbacks']);
+  (p.exercicios||[]).forEach(function(e,i){ aoa.push([i+1, e.conteudo||'', e.descricao||'', e.criterios||'', e.erros||'', e.feedback||'']); });
+  aoa.push([]);
+  aoa.push(['Registo de alterações']);
+  aoa.push(['Ação','Por','Data e hora']);
+  planoHist(p).forEach(function(x){ aoa.push([acaoLabel(x.acao), x.quem, fmtDT(x.quando)]); });
+  var ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols']=[{wch:6},{wch:26},{wch:34},{wch:28},{wch:24},{wch:24}];
+  var wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Plano');
+  XLSX.writeFile(wb, 'plano_'+p.nivel+'_'+p.numPlano+'.xlsx');
+}
+
+/* ═══════════ BIBLIOTECA DE EXERCÍCIOS ═══════════ */
+function norm(s){ return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function exSig(niv,cont,desc){ return niv+'|'+norm(cont)+'|'+norm(desc); }
+function exStatus(cls,msg){ var s=$('exStatus'); s.className='status show '+cls; s.innerHTML=msg; }
+function loadExercicios(){
+  $('biblioList').innerHTML='<div class="mini">A carregar…</div>';
+  fillExfNivel(); fillExfConteudo();
+  $('exfSearch').value=exSearch;
+  fbGet('emn_exercicios').then(function(d){
+    exercicios=[]; if(d) Object.keys(d).forEach(function(k){ var e=d[k]; e._key=k; if(!e.id) e.id=k; exercicios.push(e); });
+    renderBiblioList();
+  }).catch(function(){ $('biblioList').innerHTML='<div class="mini">Sem exercícios ou sem ligação à cloud.</div>'; });
+}
+function fillExfNivel(){ var s=$('exfNivel'); s.innerHTML='<option value="todos">Todos os níveis</option>'; NIVEL_ORDER.forEach(function(id){ s.insertAdjacentHTML('beforeend','<option value="'+id+'">'+esc(nivelNome(id))+'</option>'); }); s.value=exFilterNivel; }
+function fillExfConteudo(){
+  var opts=CONTEUDOS[exFilterNivel], wrap=$('exfConteudoWrap');
+  if(exFilterNivel!=='todos' && opts){
+    wrap.style.display='block';
+    var s=$('exfConteudo'); s.innerHTML='<option value="todos">Todos os conteúdos</option>';
+    opts.forEach(function(o){ s.insertAdjacentHTML('beforeend','<option value="'+esc(o)+'">'+esc(o)+'</option>'); });
+    s.value=exFilterConteudo||'todos';
+  } else { wrap.style.display='none'; exFilterConteudo='todos'; }
+}
+function bibCard(e,i){
+  var body='';
+  if(e.descricao) body+='<div class="bx"><b>Descrição:</b> '+nl2br(e.descricao)+'</div>';
+  if(e.criterios) body+='<div class="bx"><b>Critérios de êxito:</b> '+nl2br(e.criterios)+'</div>';
+  if(e.erros) body+='<div class="bx"><b>Erros comuns:</b> '+nl2br(e.erros)+'</div>';
+  if(e.feedback) body+='<div class="bx"><b>Feedbacks:</b> '+nl2br(e.feedback)+'</div>';
+  if(!body) body='<div class="bx" style="color:var(--g4)">(sem detalhes)</div>';
+  return '<div class="bibcard">'+body+
+    '<div class="bmeta">✍ '+esc(e.criadoPorNome||'—')+' · '+esc(fmtDT(e.criadoEm||e.atualizadoEm))+(e.origem==='plano'?' · (de um plano)':'')+'</div>'+
+    '<div class="pact"><button data-be="'+i+'" style="background:var(--bp)">✎ Editar</button><button data-bd="'+i+'" style="background:var(--rd)">🗑 Eliminar</button></div></div>';
+}
+function renderBiblioList(){
+  var q=norm(exSearch);
+  var list=exercicios.filter(function(e){
+    if(exFilterNivel!=='todos' && e.nivel!==exFilterNivel) return false;
+    if(exFilterConteudo && exFilterConteudo!=='todos' && e.conteudo!==exFilterConteudo) return false;
+    if(q){ var blob=norm([e.conteudo,e.descricao,e.criterios,e.erros,e.feedback,nivelNome(e.nivel)].join(' ')); if(blob.indexOf(q)<0) return false; }
+    return true;
+  });
+  if(!list.length){ $('biblioList').innerHTML='<div class="mini">'+(exercicios.length?'Sem exercícios para os filtros escolhidos.':'A biblioteca está vazia. Cria um exercício ou usa “Importar dos planos”.')+'</div>'; return; }
+  var byNivel={}; list.forEach(function(e){ (byNivel[e.nivel]=byNivel[e.nivel]||[]).push(e); });
+  var order=NIVEL_ORDER.filter(function(n){ return byNivel[n]; });
+  Object.keys(byNivel).forEach(function(n){ if(order.indexOf(n)<0) order.push(n); });
+  var h='';
+  order.forEach(function(n){
+    h+='<div class="bibNivel">'+esc(nivelNome(n))+'<span class="cnt">'+byNivel[n].length+'</span></div>';
+    var byCont={}; byNivel[n].forEach(function(e){ var c=(e.conteudo||'').trim()||'(sem conteúdo)'; (byCont[c]=byCont[c]||[]).push(e); });
+    Object.keys(byCont).sort(function(a,b){ return a.localeCompare(b,'pt'); }).forEach(function(c){
+      h+='<div class="bibCont">'+esc(c)+'</div>';
+      byCont[c].forEach(function(e){ h+=bibCard(e, exercicios.indexOf(e)); });
+    });
+  });
+  $('biblioList').innerHTML=h;
+  $('biblioList').querySelectorAll('[data-be]').forEach(function(b){ b.onclick=function(){ openExForm(exercicios[+b.getAttribute('data-be')]); }; });
+  $('biblioList').querySelectorAll('[data-bd]').forEach(function(b){ b.onclick=function(){ delEx(exercicios[+b.getAttribute('data-bd')]); }; });
+}
+function fillExNivel(){ var s=$('exNivel'); s.innerHTML=''; PLANO_NIVEIS.forEach(function(n){ s.insertAdjacentHTML('beforeend','<option value="'+n.id+'">'+esc(n.nome)+'</option>'); }); }
+function fillExAutor(){ var s=$('exAutor'); s.innerHTML='<option value="">— seleciona —</option>'; professors.forEach(function(p){ s.insertAdjacentHTML('beforeend','<option value="'+esc(p.key)+'">'+esc(p.nome)+'</option>'); }); }
+function renderExConteudoField(cur){
+  var niv=$('exNivel').value, opts=CONTEUDOS[niv], html;
+  if(opts){ html='<select id="exConteudo"><option value="">— selecionar —</option>'; opts.forEach(function(o){ html+='<option value="'+esc(o)+'"'+(cur===o?' selected':'')+'>'+esc(o)+'</option>'; }); html+='</select>'; }
+  else { html='<input id="exConteudo" type="text" placeholder="Escrever o conteúdo" value="'+esc(cur||'')+'">'; }
+  $('exConteudoWrap').innerHTML=html;
+}
+function openExForm(e){
+  $('viewProf').classList.add('hidden'); $('viewPlanos').classList.add('hidden'); $('viewBiblio').classList.add('hidden'); $('viewAdmin').classList.add('hidden');
+  $('viewExForm').classList.remove('hidden');
+  fillExNivel(); fillExAutor(); $('exStatus').className='status';
+  if(e){
+    exEditId=e.id||e._key;
+    $('exFormTitle').textContent='Editar exercício';
+    $('exNivel').value=e.nivel; renderExConteudoField(e.conteudo||'');
+    $('exDesc').value=e.descricao||''; $('exCrit').value=e.criterios||''; $('exErros').value=e.erros||''; $('exFb').value=e.feedback||'';
+    if(e.criadoPorKey){ if(!professors.some(function(p){return p.key===e.criadoPorKey;})) $('exAutor').insertAdjacentHTML('beforeend','<option value="'+esc(e.criadoPorKey)+'">'+esc(e.criadoPorNome||e.criadoPorKey)+'</option>'); $('exAutor').value=e.criadoPorKey; }
+  } else {
+    exEditId=null; $('exFormTitle').textContent='Novo exercício';
+    $('exNivel').value=(exFilterNivel!=='todos'?exFilterNivel:'ini'); renderExConteudoField('');
+    $('exDesc').value=''; $('exCrit').value=''; $('exErros').value=''; $('exFb').value='';
+  }
+  $('exPin').value='';
+}
+function submitEx(){
+  var niv=$('exNivel').value;
+  var conteudo=$('exConteudo')?$('exConteudo').value.trim():'';
+  var desc=$('exDesc').value.trim(), crit=$('exCrit').value.trim(), erros=$('exErros').value.trim(), fb=$('exFb').value.trim();
+  var pk=$('exAutor').value, pin=$('exPin').value.trim();
+  if(!conteudo && !desc){ exStatus('errm','Indica pelo menos o conteúdo ou a descrição.'); return; }
+  if(!pk){ exStatus('errm','Seleciona o autor.'); return; }
+  if(!/^\d{4,6}$/.test(pin)){ exStatus('errm','Introduz o PIN (4 a 6 dígitos).'); return; }
+  var existing=exercicios.filter(function(x){ return (x.id||x._key)===exEditId; })[0];
+  var okAdmin=cfg.adminPin && hashPin(pin)===cfg.adminPin;
+  var st=checkPin(pk,pin), firstTime=false;
+  if(!okAdmin){
+    if(st==='wrong'){ exStatus('errm','PIN incorreto.'); return; }
+    if(exEditId && existing && existing.criadoPorKey && existing.criadoPorKey!==pk){ exStatus('errm','Só o autor ou a coordenação podem editar este exercício.'); return; }
+    firstTime=(st==='set');
+  }
+  var prof=professors.filter(function(p){return p.key===pk;})[0];
+  var quem=prof?prof.nome:pk;
+  var id=exEditId||('x'+Date.now()+'_'+Math.floor(Math.random()*100000));
+  var now=new Date().toISOString();
+  var rec={ id:id, nivel:niv, conteudo:conteudo, descricao:desc, criterios:crit, erros:erros, feedback:fb,
+    criadoPorKey: existing?existing.criadoPorKey:pk, criadoPorNome: existing?existing.criadoPorNome:quem,
+    criadoEm: existing?existing.criadoEm:now, atualizadoEm:now, origem: existing?(existing.origem||'biblioteca'):'biblioteca' };
+  exStatus('info','A guardar…');
+  var savePin=firstTime?fbPut('emn_pins/'+pk,hashPin(pin)).then(function(){pins[pk]=hashPin(pin);}):Promise.resolve();
+  savePin.then(function(){ return fbPut('emn_exercicios/'+id, rec); }).then(function(){
+    exStatus('done','✅ Exercício guardado.'); setTimeout(function(){ showTab('biblio'); }, 700);
+  }).catch(function(e){ exStatus('errm','Erro ao guardar: '+e.message); });
+}
+function delEx(e){
+  var pin=prompt('Para eliminar, introduz o PIN do autor ou da coordenação:');
+  if(pin==null) return;
+  var okAdmin=cfg.adminPin && hashPin(pin)===cfg.adminPin;
+  var okAutor=e.criadoPorKey && pins[e.criadoPorKey] && pins[e.criadoPorKey]===hashPin(pin);
+  if(!okAdmin && !okAutor){ alert('PIN incorreto ou sem permissão.'); return; }
+  var id=e.id||e._key;
+  fetch(CLOUD+'/emn_exercicios/'+id+'.json',{method:'DELETE'}).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); loadExercicios(); }).catch(function(err){ alert('Erro ao eliminar: '+err.message); });
+}
+function insertExercicios(items){
+  // items: [{nivel,conteudo,descricao,criterios,erros,feedback,criadoPorKey,criadoPorNome}]
+  var now=new Date().toISOString();
+  return Promise.all(items.map(function(a,i){
+    var id='x'+Date.now()+'_'+i+'_'+Math.floor(Math.random()*100000);
+    return fbPut('emn_exercicios/'+id, {id:id, nivel:a.nivel, conteudo:a.conteudo||'', descricao:a.descricao||'', criterios:a.criterios||'', erros:a.erros||'', feedback:a.feedback||'', criadoPorKey:a.criadoPorKey||null, criadoPorNome:a.criadoPorNome||'—', criadoEm:now, atualizadoEm:now, origem:'plano'});
+  }));
+}
+function autoLibFromPlano(rec){
+  fbGet('emn_exercicios').then(function(ex){
+    ex=ex||{}; var sig={}; Object.keys(ex).forEach(function(k){ var e=ex[k]; sig[exSig(e.nivel,e.conteudo,e.descricao)]=true; });
+    var add=[];
+    (rec.exercicios||[]).forEach(function(e){
+      if(!(e.conteudo||e.descricao||'').trim()) return;
+      var s=exSig(rec.nivel,e.conteudo,e.descricao);
+      if(!sig[s]){ sig[s]=true; add.push({nivel:rec.nivel, conteudo:e.conteudo, descricao:e.descricao, criterios:e.criterios, erros:e.erros, feedback:e.feedback, criadoPorKey:rec.criadoPorKey, criadoPorNome:rec.criadoPorNome}); }
+    });
+    if(add.length) insertExercicios(add);
+  }).catch(function(){});
+}
+function importFromPlanos(){
+  if(!confirm('Importar para a biblioteca todos os exercícios dos planos existentes?\n(não cria duplicados)')) return;
+  Promise.all([fbGet('emn_planos'), fbGet('emn_exercicios')]).then(function(r){
+    var pl=r[0]||{}, ex=r[1]||{};
+    var sig={}; Object.keys(ex).forEach(function(k){ var e=ex[k]; sig[exSig(e.nivel,e.conteudo,e.descricao)]=true; });
+    var add=[];
+    Object.keys(pl).forEach(function(k){ var p=pl[k]; (p.exercicios||[]).forEach(function(e){
+      if(!(e.conteudo||e.descricao||'').trim()) return;
+      var s=exSig(p.nivel,e.conteudo,e.descricao);
+      if(!sig[s]){ sig[s]=true; add.push({nivel:p.nivel, conteudo:e.conteudo, descricao:e.descricao, criterios:e.criterios, erros:e.erros, feedback:e.feedback, criadoPorKey:p.criadoPorKey, criadoPorNome:p.criadoPorNome}); }
+    }); });
+    if(!add.length){ alert('Nada a importar — a biblioteca já contém esses exercícios.'); return; }
+    insertExercicios(add).then(function(){ alert(add.length+' exercício(s) importado(s).'); loadExercicios(); }).catch(function(e){ alert('Erro ao importar: '+e.message); });
+  }).catch(function(e){ alert('Erro: '+e.message); });
+}
+
+function saveAllExFromPlano(){
+  var niv=$('pfNivel').value;
+  var quem='—';
+  if(pfMode==='admin'){ quem='Coordenação'; }
+  else { var pk0=$('pfProf').value; var prof0=professors.filter(function(p){return p.key===pk0;})[0]; if(prof0) quem=prof0.nome; }
+  var msgEl=$('pfSaveAllMsg');
+  var valid=pfExsData.filter(function(e){ return (e.conteudo||'').trim() || (e.descricao||'').trim(); });
+  if(!valid.length){ msgEl.textContent='Nada para guardar — preenche conteúdo ou descrição.'; return; }
+  msgEl.textContent='A guardar…';
+  fbGet('emn_exercicios').then(function(ex){
+    ex=ex||{}; var sig={}; Object.keys(ex).forEach(function(k){ var x=ex[k]; sig[exSig(x.nivel,x.conteudo,x.descricao)]=true; });
+    var add=[];
+    valid.forEach(function(e){ var s=exSig(niv,e.conteudo,e.descricao); if(!sig[s]){ sig[s]=true; add.push({nivel:niv, conteudo:e.conteudo, descricao:e.descricao, criterios:e.criterios, erros:e.erros, feedback:e.feedback, criadoPorKey:(pfMode==='admin'?null:$('pfProf').value)||null, criadoPorNome:quem}); } });
+    if(!add.length){ msgEl.textContent='ℹ Todos já estavam na biblioteca.'; return Promise.resolve(); }
+    return insertExercicios(add).then(function(){ msgEl.textContent='✅ '+add.length+' exercício(s) guardado(s) em '+nivelNome(niv)+'.'; });
+  }).catch(function(e){ msgEl.textContent='Erro: '+e.message; });
+}
+
+/* ═══════════ MODAL: IMPORTAR EXERCÍCIO PARA O PLANO ═══════════ */
+function openExImport(){
+  eximNivel = $('pfNivel').value || 'todos';
+  eximConteudo='todos'; eximSearch='';
+  $('eximSearch').value='';
+  fillEximNivel(); fillEximConteudo();
+  $('eximOverlay').classList.remove('hidden');
+  if(exercicios.length){ renderEximList(); }
+  else {
+    $('eximList').innerHTML='<div class="mini">A carregar…</div>';
+    fbGet('emn_exercicios').then(function(d){
+      exercicios=[]; if(d) Object.keys(d).forEach(function(k){ var e=d[k]; e._key=k; if(!e.id) e.id=k; exercicios.push(e); });
+      renderEximList();
+    }).catch(function(){ $('eximList').innerHTML='<div class="mini">Sem exercícios ou sem ligação à cloud.</div>'; });
+  }
+}
+function closeExImport(){ $('eximOverlay').classList.add('hidden'); }
+function fillEximNivel(){ var s=$('eximNivel'); s.innerHTML='<option value="todos">Todos os níveis</option>'; NIVEL_ORDER.forEach(function(id){ s.insertAdjacentHTML('beforeend','<option value="'+id+'">'+esc(nivelNome(id))+'</option>'); }); s.value=eximNivel; }
+function fillEximConteudo(){
+  var opts=CONTEUDOS[eximNivel], wrap=$('eximContWrap');
+  if(eximNivel!=='todos' && opts){
+    wrap.style.display='block';
+    var s=$('eximConteudo'); s.innerHTML='<option value="todos">Todos os conteúdos</option>';
+    opts.forEach(function(o){ s.insertAdjacentHTML('beforeend','<option value="'+esc(o)+'">'+esc(o)+'</option>'); });
+    s.value=eximConteudo||'todos';
+  } else { wrap.style.display='none'; eximConteudo='todos'; }
+}
+function renderEximList(){
+  var q=norm(eximSearch);
+  var list=exercicios.filter(function(e){
+    if(eximNivel!=='todos' && e.nivel!==eximNivel) return false;
+    if(eximConteudo!=='todos' && e.conteudo!==eximConteudo) return false;
+    if(q){ var blob=norm([e.conteudo,e.descricao,e.criterios,e.erros,e.feedback,nivelNome(e.nivel)].join(' ')); if(blob.indexOf(q)<0) return false; }
+    return true;
+  });
+  if(!list.length){ $('eximList').innerHTML='<div class="mini">Sem exercícios para os filtros escolhidos.</div>'; return; }
+  var h='';
+  list.forEach(function(e,i){
+    h+='<div class="eximCard"><div class="eb">'+esc(nivelNome(e.nivel))+(e.conteudo?(' · '+esc(e.conteudo)):'')+'</div>';
+    if(e.descricao) h+='<div class="ex"><b>Descrição:</b> '+nl2br(e.descricao)+'</div>';
+    if(e.criterios) h+='<div class="ex"><b>Critérios:</b> '+nl2br(e.criterios)+'</div>';
+    h+='<button data-ai="'+i+'">＋ Adicionar ao plano</button></div>';
+  });
+  $('eximList').innerHTML=h;
+  $('eximList').querySelectorAll('[data-ai]').forEach(function(b){ b.onclick=function(){ addExFromLibrary(list[+b.getAttribute('data-ai')], b); }; });
+}
+function addExFromLibrary(e, btnEl){
+  var novo={conteudo:e.conteudo||'', descricao:e.descricao||'', criterios:e.criterios||'', erros:e.erros||'', feedback:e.feedback||''};
+  var onlyEmpty = pfExsData.length===1 && !pfExsData[0].conteudo && !pfExsData[0].descricao && !pfExsData[0].criterios && !pfExsData[0].erros && !pfExsData[0].feedback;
+  if(onlyEmpty) pfExsData[0]=novo; else pfExsData.push(novo);
+  renderPfExs();
+  if(btnEl){ btnEl.textContent='✅ Adicionado'; btnEl.classList.add('added'); btnEl.disabled=true; }
+}
+
+/* ═══════════ WIRING ═══════════ */
+$('btnGps').onclick=function(){ requestGps(); };
+$('selProf').onchange=function(){
+  if($('selProf').value==='__free__'){
+    var nm=prompt('Escreve o teu nome completo');
+    if(nm){ var k=slug(nm); professors.push({key:k,nome:nm}); fillProfs(); $('selProf').value=k; }
+    else { $('selProf').value=''; }
+  }
+  refreshTodayState();
+};
+$('btnEnter').onclick=function(){ doMark('enter'); };
+$('btnExit').onclick=function(){ doMark('exit'); };
+$('lnkAdmin').onclick=openAdmin;
+$('lnkAdmin2').onclick=openAdmin;
+$('btnBack').onclick=function(){ showTab(curTab||'pres'); };
+$('navPres').onclick=function(){ showTab('pres'); };
+$('navPlanos').onclick=function(){ showTab('planos'); };
+$('btnNewPlano').onclick=function(){ openPlanoForm(null,'prof'); };
+$('pfNivel').onchange=renderPfExs;
+$('pfAddEx').onclick=function(){ pfExsData.push({conteudo:'',descricao:'',criterios:'',erros:'',feedback:''}); renderPfExs(); };
+$('pfImportEx').onclick=openExImport;
+$('eximClose').onclick=closeExImport;
+$('eximOverlay').onclick=function(ev){ if(ev.target===$('eximOverlay')) closeExImport(); };
+$('eximNivel').onchange=function(){ eximNivel=$('eximNivel').value; eximConteudo='todos'; fillEximConteudo(); renderEximList(); };
+$('eximConteudo').onchange=function(){ eximConteudo=$('eximConteudo').value; renderEximList(); };
+$('eximSearch').oninput=function(){ eximSearch=$('eximSearch').value; renderEximList(); };
+$('pfSaveAllEx').onclick=saveAllExFromPlano;
+$('pfSubmit').onclick=submitPlano;
+$('pfCancel').onclick=backFromForm;
+$('navBiblio').onclick=function(){ showTab('biblio'); };
+$('lnkAdmin3').onclick=openAdmin;
+$('btnNewEx').onclick=function(){ openExForm(null); };
+$('btnImportEx').onclick=importFromPlanos;
+$('exfNivel').onchange=function(){ exFilterNivel=$('exfNivel').value; exFilterConteudo='todos'; fillExfConteudo(); renderBiblioList(); };
+$('exfConteudo').onchange=function(){ exFilterConteudo=$('exfConteudo').value; renderBiblioList(); };
+$('exfSearch').oninput=function(){ exSearch=$('exfSearch').value; renderBiblioList(); };
+$('exNivel').onchange=function(){ renderExConteudoField(''); };
+$('exSave').onclick=submitEx;
+$('exCancel').onclick=function(){ showTab('biblio'); };
+$('btnSaveRadius').onclick=function(){ var v=parseInt($('inRadius').value,10); if(isNaN(v)||v<20){ alert('Raio inválido.'); return; } cfg.radius=v; saveCfg().then(function(){ alert('Raio guardado: '+v+' m'); }); };
+$('btnExport').onclick=exportCsv;
+$('btnAddRec').onclick=function(){ openRecForm(null); };
+$('rfSave').onclick=saveRecForm;
+$('rfCancel').onclick=function(){ $('recForm').classList.add('hidden'); editingRef=null; };
+$('recDate').onchange=renderRecs;
+$('btnSaveCloud').onclick=function(){ var u=$('inCloud').value.trim().replace(/\/+$/,''); if(!/^https?:\/\//.test(u)){ alert('URL inválido.'); return; } try{ localStorage.setItem('emf_presencas_url',u); }catch(e){} CLOUD=u; alert('URL guardado neste dispositivo. Recarrega a página.'); };
+$('btnSaveAdminPin').onclick=function(){ var p=$('inAdminPin').value.trim(); if(!/^\d{4,6}$/.test(p)){ alert('PIN de 4 a 6 dígitos.'); return; } cfg.adminPin=hashPin(p); saveCfg().then(function(){ $('inAdminPin').value=''; alert('PIN de administrador definido.'); }); };
+document.querySelectorAll('.tt button').forEach(function(b){ b.onclick=function(){ switchAdminTab(b.getAttribute('data-at')); }; });
+
+/* ═══════════ ARRANQUE ═══════════ */
+(function init(){
+  if(!CLOUD){
+    setLoc('err','Falta configurar','O URL da Firebase não está definido. Abre ⚙︎ Administração › Definições para o introduzir.');
+    $('btnGps').disabled=true;
+    return;
+  }
+  loadAll().then(function(){ fillProfs(); });
+})();
+</script>
+</body>
+</html>
