@@ -5639,6 +5639,16 @@ function unlinkOcupCell(childKey) {
   commit();
 }
 
+// Células que copiam os valores desta (turmas 2x/semana emparelhadas)
+function getOcupLinkChildren(parentKey) {
+  var occ = getOcupData(), out = [];
+  for (var k in occ.links) if (occ.links[k] === parentKey) out.push(k);
+  return out;
+}
+function ocupKeyLabel(key) {
+  var p = key.split('|');
+  return DAYS_SHORT[parseInt(p[1],10)] + ' ' + p[0];
+}
 function parseOcupKey(key) {
   var p = key.split('|');
   return {hora:p[0], di:parseInt(p[1],10), niv:p[2]};
@@ -5679,6 +5689,36 @@ function saveOcupSlot(mon, hora, di, niv, field, val) {
   if (!occ[mon][k]) occ[mon][k] = {max:0, alunos:0};
   occ[mon][k][field] = val;
   commit();
+}
+
+// Atualiza no ecrã as células que copiam os valores desta, sem redesenhar a tabela
+function updateOcupMirrors(month, parentKey) {
+  var kids = getOcupLinkChildren(parentKey);
+  if (!kids.length) return;
+  var pp = parseOcupKey(parentKey);
+  var sd = getOcupSlot(month, pp.hora, pp.di, pp.niv);
+  var pct = sd.max>0 ? Math.round(sd.alunos/sd.max*100) : 0;
+  var els = document.querySelectorAll('.ocup-mirror[data-child-of="'+parentKey+'"]');
+  for (var i=0;i<els.length;i++) {
+    var f = els[i].getAttribute('data-field');
+    if (f==='max') els[i].textContent = sd.max || '—';
+    else if (f==='alunos') els[i].textContent = sd.alunos || '—';
+    else if (f==='pct') els[i].textContent = sd.max>0 ? pct+'%' : '';
+  }
+}
+// Recalcula os quadrados e o gráfico do separador ativo
+function refreshOcupSummary() {
+  if (ocupSub === 'geral') return;
+  var catData = OCUP_CATS[ocupSub];
+  if (!catData) return;
+  buildOcupStats(ocupSub, catData);
+  buildOcupChart(ocupSub, catData);
+  if (ocupSub === 'criancas') {
+    var bn = getBebeNivs();
+    var sb = document.getElementById('ocupStatsBeb'), cb = document.getElementById('ocupChartBeb');
+    if (sb) sb.innerHTML = ocupStatTilesHTML(bn, ocupMonth, BEBE_COLOR, false);
+    if (cb) cb.innerHTML = ocupChartSVG(bn, BEBE_COLOR, ocupMonth);
+  }
 }
 
 function switchOcupSub(sub, el) {
@@ -5798,12 +5838,12 @@ function ocupCellHTML(hora, di, nivelFilter, month) {
       var pct=sd.max>0?Math.round(sd.alunos/sd.max*100):0;
       maxCell+='<div style="display:flex;align-items:center;gap:2px;margin-bottom:'+mb+'">';
       maxCell+='<span style="background:'+lvlColor(niv)+';color:'+(lvlTextCls(niv)?"#222":"#fff")+';padding:.04rem .25rem;border-radius:2px;font-size:.58rem;font-weight:700;flex-shrink:0">'+nv.lb+'</span>';
-      maxCell+='<span style="font-size:.74rem;color:var(--g7);min-width:30px;text-align:center">'+(sd.max||'—')+'</span>';
-      maxCell+='<span class="ocup-link-btn" data-act="unlink" data-key="'+selfKey+'" title="Ligado a '+DAYS_SHORT[pp.di]+' '+pp.hora+' — clique para desligar" style="cursor:pointer;font-size:.62rem;opacity:.5">&#128279;</span>';
+      maxCell+='<span class="ocup-mirror" data-child-of="'+parentKey+'" data-field="max" style="font-size:.74rem;color:#1565c0;font-style:italic;min-width:30px;text-align:center">'+(sd.max||'—')+'</span>';
+      maxCell+='<span class="ocup-link-btn" data-act="unlink" data-key="'+selfKey+'" title="Copia de '+DAYS_SHORT[pp.di]+' '+pp.hora+' — clique para desligar" style="cursor:pointer;font-size:.62rem;color:#1565c0">&#128279;</span>';
       maxCell+='</div>';
       alunCell+='<div style="display:flex;align-items:center;gap:2px;margin-bottom:'+mb+'">';
-      alunCell+='<span style="font-size:.74rem;color:var(--g7);font-weight:600;min-width:30px;text-align:center">'+(sd.alunos||'—')+'</span>';
-      if (sd.max>0) alunCell+='<span style="font-size:.58rem;color:var(--g4)">'+pct+'%</span>';
+      alunCell+='<span class="ocup-mirror" data-child-of="'+parentKey+'" data-field="alunos" style="font-size:.74rem;color:#1565c0;font-style:italic;font-weight:600;min-width:30px;text-align:center">'+(sd.alunos||'—')+'</span>';
+      alunCell+='<span class="ocup-mirror" data-child-of="'+parentKey+'" data-field="pct" style="font-size:.58rem;color:var(--g4)">'+(sd.max>0?pct+'%':'')+'</span>';
       alunCell+='</div>';
     } else {
       var sd=getOcupSlot(month,hora,di,niv);
@@ -5812,7 +5852,9 @@ function ocupCellHTML(hora, di, nivelFilter, month) {
       maxCell+='<div style="display:flex;align-items:center;gap:2px;margin-bottom:'+mb+'">';
       maxCell+='<span style="background:'+lvlColor(niv)+';color:'+(lvlTextCls(niv)?"#222":"#fff")+';padding:.04rem .25rem;border-radius:2px;font-size:.58rem;font-weight:700;flex-shrink:0">'+nv.lb+'</span>';
       maxCell+='<input type="number" min="0" max="999" class="ocup-inp" data-mon="'+month+'" data-hora="'+hora+'" data-di="'+di+'" data-niv="'+niv+'" data-field="max" value="'+(sd.max||'')+'" style="width:32px;font-size:.74rem;padding:.1rem;border:1px solid #ccc;border-radius:3px;text-align:center" placeholder="—">';
-      maxCell+='<span class="ocup-link-btn" data-act="link" data-key="'+selfKey+'" data-niv="'+niv+'" title="Ligar a outra aula da mesma turma" style="cursor:pointer;font-size:.62rem;opacity:.4">&#128279;</span>';
+      var kids = getOcupLinkChildren(selfKey);
+      var kidTitle = kids.length ? ('Origem de: ' + kids.map(ocupKeyLabel).join(', ')) : 'Ligar a outra aula da mesma turma';
+      maxCell+='<span class="ocup-link-btn" data-act="link" data-key="'+selfKey+'" data-niv="'+niv+'" title="'+kidTitle+'" style="cursor:pointer;font-size:.62rem;'+(kids.length?'color:#1565c0':'opacity:.4')+'">&#128279;</span>';
       maxCell+='</div>';
       alunCell+='<div style="display:flex;align-items:center;gap:2px;margin-bottom:'+mb+'">';
       alunCell+='<input type="number" min="0" max="999" class="ocup-inp" data-mon="'+month+'" data-hora="'+hora+'" data-di="'+di+'" data-niv="'+niv+'" data-field="alunos" value="'+(sd.alunos||'')+'" style="width:32px;font-size:.74rem;padding:.1rem;border:1px solid #ccc;border-radius:3px;text-align:center" placeholder="—">';
@@ -5874,6 +5916,8 @@ function buildOcupTable(containerId, nivelFilter, month) {
         var di=parseInt(inp.getAttribute('data-di'),10), niv=inp.getAttribute('data-niv');
         var field=inp.getAttribute('data-field'), val=parseInt(inp.value,10)||0;
         saveOcupSlot(mon,hora,di,niv,field,val);
+        updateOcupMirrors(mon, ocupKey(hora,di,niv));
+        refreshOcupSummary();
         if (field==='alunos' || field==='max') {
           var allInRow = inp.closest('tr').querySelectorAll('.ocup-inp[data-niv="'+niv+'"][data-hora="'+hora+'"][data-di="'+di+'"]');
           var maxInp=null, alunInp=null;
