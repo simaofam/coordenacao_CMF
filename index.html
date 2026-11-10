@@ -362,6 +362,7 @@ code{background:rgba(0,0,0,.08);padding:.05rem .35rem;border-radius:3px;font-siz
   <button class="ni" onclick="showTab('t9',this)"><span class="ni-icon">&#128202;</span> Mapa de Ocupa&#231;&#227;o</button>
   <button class="ni" onclick="showTab('t10',this)"><span class="ni-icon">&#128181;</span> Previs&#227;o de Receita</button>
   <button class="ni" onclick="showTab('t15',this)"><span class="ni-icon">&#9203;</span> Lista de Espera</button>
+  <button class="ni" onclick="showTab('t16',this)"><span class="ni-icon">&#128221;</span> Pedidos de Altera&#231;&#227;o</button>
   <hr class="ndiv">
   <div class="ns-lbl">Opera&#231;&#245;es</div>
   <button class="ni" onclick="showTab('t4',this)"><span class="ni-icon">&#10060;</span> Faltas</button>
@@ -837,7 +838,101 @@ code{background:rgba(0,0,0,.08);padding:.05rem .35rem;border-radius:3px;font-siz
   <div id="esp-box"></div>
 </div>
 
+<div id="t16" class="tab">
+  <div class="ttitle">&#128221; Pedidos de Altera&#231;&#227;o de Hor&#225;rio
+    <div class="exp-grp">
+      <button class="exp-btn exp-pdf" onclick="exportPDF('pedidos')">&#128196; PDF</button>
+      <button class="exp-btn exp-xls" onclick="exportXLS('pedidos')">&#128202; Excel</button>
+    </div>
+  </div>
+  <div class="subtabs" id="pedSubtabs"></div>
+  <div id="ped-box"></div>
+  <div id="ped-legenda"></div>
 </div>
+
+</div>
+</div>
+
+<!-- MODAL FICHA DO PEDIDO -->
+<div class="mo" id="mPed">
+  <div class="md" style="width:min(720px,96vw);max-height:92vh;overflow-y:auto">
+    <div class="mh"><h3 id="mPedTitle">Novo Pedido</h3><button class="mc" onclick="closePedModal()">&#215;</button></div>
+    <div class="mb">
+      <div class="fr fc2">
+        <div class="fg"><label>N&#186; Utente</label><input type="text" id="pedNum"></div>
+        <div class="fg"><label>Nome</label><input type="text" id="pedNome"></div>
+      </div>
+      <div class="fr fc2">
+        <div class="fg"><label>Telefone</label><input type="tel" id="pedTel"></div>
+        <div class="fg"><label>Quem inseriu</label><input type="text" id="pedQuem" placeholder="nome e data"></div>
+      </div>
+
+      <div style="background:#eef3f9;border-left:4px solid #0a3d6b;border-radius:6px;padding:.6rem .85rem;margin:.85rem 0 .5rem">
+        <strong style="color:#0a3d6b;font-size:.88rem">N&#237;vel / Modalidade</strong>
+      </div>
+      <div class="fr fc2">
+        <div class="fg"><label>N&#237;vel</label><select id="pedNivel" onchange="onPedNivelChange()"></select></div>
+        <div class="fg" id="pedNivelTxtWrap" style="display:none"><label id="pedNivelTxtLbl">Escrever o n&#237;vel</label><input type="text" id="pedNivelTxt" placeholder="texto livre"></div>
+      </div>
+      <div style="font-size:.74rem;color:#888;margin:-.5rem 0 .85rem">No texto livre n&#227;o consigo consultar o Mapa de Ocupa&#231;&#227;o.</div>
+
+      <div style="background:#fff3e0;border-left:4px solid #e65100;border-radius:6px;padding:.6rem .85rem;margin:.5rem 0">
+        <strong style="color:#e65100;font-size:.88rem">Turma Atual</strong>
+      </div>
+      <div class="fr fc2">
+        <div class="fg"><label>Dias</label><select id="pedAtualDias"></select></div>
+        <div class="fg"><label>Hora</label><input type="text" id="pedAtualH1" placeholder="ex: 17H30"></div>
+      </div>
+      <div class="fg" style="margin-bottom:.85rem"><label>Hora do 2&#186; dia (quando difere)</label><input type="text" id="pedAtualH2" placeholder="ex: 09H50"></div>
+      <div class="fg" style="margin-bottom:.85rem"><label>Texto original do Excel</label><input type="text" id="pedAtualTxt" readonly style="background:#f5f5f5;color:#666"></div>
+
+      <div style="background:#e8f5e9;border-left:4px solid #2e7d32;border-radius:6px;padding:.6rem .85rem;margin:.5rem 0">
+        <strong style="color:#2e7d32;font-size:.88rem">Turma(s) Pretendida(s)</strong>
+        <div style="font-size:.74rem;color:#555;margin-top:.15rem">At&#233; 3 op&#231;&#245;es. As vagas s&#227;o lidas do Mapa de Ocupa&#231;&#227;o.</div>
+      </div>
+      <div id="pedOpcoesBox"></div>
+      <div class="fg" style="margin:.5rem 0 .85rem"><label>Texto original do Excel</label><input type="text" id="pedPretTxt" readonly style="background:#f5f5f5;color:#666"></div>
+
+      <div style="background:#eef3f9;border-left:4px solid #0a3d6b;border-radius:6px;padding:.6rem .85rem;margin:.5rem 0">
+        <strong style="color:#0a3d6b;font-size:.88rem">Decis&#227;o</strong>
+      </div>
+      <div class="fr fc2">
+        <div class="fg"><label>Estado</label><select id="pedEstado"></select></div>
+        <div class="fg"><label>Data</label><input type="date" id="pedData"></div>
+      </div>
+      <div class="fg" style="margin-bottom:.5rem"><label>Observa&#231;&#245;es</label><textarea id="pedObs" rows="3"></textarea></div>
+      <div class="cp" style="display:inline-flex"><input type="checkbox" id="pedAlerta"><label for="pedAlerta">&#9888;&#65039; Por confirmar (destacar na lista)</label></div>
+    </div>
+    <div class="mf">
+      <button class="btn br" id="pedDelBtn" onclick="deletePedido()" style="margin-right:auto;display:none">&#128465; Eliminar</button>
+      <button class="btn bo" onclick="closePedModal()" style="margin-right:.5rem">Cancelar</button>
+      <button class="btn bp" onclick="savePedido()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL IMPORTAR PEDIDOS -->
+<div class="mo" id="mPedImp">
+  <div class="md" style="width:min(1000px,96vw);max-height:92vh;overflow-y:auto">
+    <div class="mh"><h3>&#128229; Importar Pedidos</h3><button class="mc" onclick="closePedImpModal()">&#215;</button></div>
+    <div class="mb">
+      <div style="background:#e3f2fd;border-left:4px solid #1565c0;border-radius:6px;padding:.65rem .85rem;margin-bottom:.9rem;font-size:.8rem;color:#1a2332">
+        Carrega o Excel do mapa de pedidos. L&#234; <strong>as tr&#234;s folhas</strong> (Felgueiras, Lixa, Id&#227;es) e usa o nome da folha como piscina.
+        Tudo o que n&#227;o conseguir interpretar fica marcado a &#226;mbar com &#9888;&#65039; para confirmares.
+      </div>
+      <div class="fr fc2">
+        <div class="fg"><label>Ficheiro Excel</label><input type="file" id="pedImpFile" accept=".xlsx,.xls,.csv"></div>
+        <div class="fg"><label>Piscina (quando a folha n&#227;o disser)</label><select id="pedImpPool"></select></div>
+      </div>
+      <div class="fg" style="margin-bottom:.6rem"><label>Ou colar aqui</label><textarea id="pedImpTxt" rows="6" placeholder="Nº Utente&#9;Nome&#9;Turma Atual&#9;Nível&#9;Turma Pretendida&#9;Contacto&#9;Confirmação"></textarea></div>
+      <button class="btn bp bsm" onclick="pedImpAnalisar()">&#128269; Analisar</button>
+      <div id="pedImpPreview" style="margin-top:1rem"></div>
+    </div>
+    <div class="mf">
+      <button class="btn bo" onclick="closePedImpModal()" style="margin-right:.5rem">Cancelar</button>
+      <button class="btn bp" id="pedImpOkBtn" onclick="pedImpConfirmar()" style="display:none">Importar</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL ENVIAR POR WHATSAPP -->
@@ -2022,6 +2117,7 @@ function showTab(id, el) {
   if (id==='t13') { renderAcademias(); }
   if (id==='t14') { renderAltTab(); }
   if (id==='t15') { renderEsperaTab(); }
+  if (id==='t16') { renderPedTab(); }
 }
 
 // ═══ SCHEDULE ═══
@@ -3401,6 +3497,7 @@ function exportPDF(what) {
   else if (what === 'grupos') { title = 'Distribuição de Grupos'; body = grpSub==='semanal' ? buildGruposHTMLSemanal() : buildGruposHTML(); }
   else if (what === 'alt') { title = 'Alterações de Horário — ' + getAltRange().label; body = buildAltHTML(); }
   else if (what === 'espera') { title = 'Lista de Espera'; body = buildEsperaHTML(); }
+  else if (what === 'pedidos') { title = 'Pedidos de Alteração de Horário — ' + espPlain(pedVistaLabel()); body = buildPedidosHTML(); }
   else if (what === 'mapa' || what === 'academias') {
     // Mapa de Turmas / Academias: A3 horizontal, ajustado a uma página
     if (what === 'academias' && curPool !== 'felgueiras') { alert('As Academias só existem na Piscina de Felgueiras.'); return; }
@@ -3944,6 +4041,7 @@ function exportXLS(what) {
   if (what === 'grupos') { exportGruposExcel(); return; }
   if (what === 'alt') { exportAltExcel(); return; }
   if (what === 'espera') { exportEsperaExcel(); return; }
+  if (what === 'pedidos') { exportPedidosExcel(); return; }
   if (what === 'dash') {
     var totalA = 0, lvlC = {};
     var allH = d.weekHoras.concat(d.satHoras, d.sunHoras);
@@ -8950,6 +9048,834 @@ function exportEsperaExcel() {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(espRowsForExport(cats[i][0])), cats[i][1]);
   }
   XLSX.writeFile(wb, exportFileBase() + '_lista_espera.xlsx');
+}
+
+
+// ═══ PEDIDOS DE ALTERAÇÃO DE HORÁRIO ═══
+var pedFiltro = 'todos';
+var pedPoolView = '';   // '' = piscina ativa | id de piscina | 'todas'
+var pedSearch = '';
+var editPedId = null;
+var pedImpRows = [];
+
+var PED_ESTADOS = [
+  {k:'',           lb:'Por decidir',      c:'#8a94a6'},
+  {k:'ligar',      lb:'Ligar',            c:'#e65100'},
+  {k:'semvaga',    lb:'Sem vaga',         c:'#c62828'},
+  {k:'confirmado', lb:'Confirmado',       c:'#2e7d32'},
+  {k:'naoatendeu', lb:'Não atendeu', c:'#6a1b9a'},
+  {k:'desistiu',   lb:'Desistiu/anulou',  c:'#5a6474'}
+];
+var PED_FILTROS = [
+  {k:'todos',   lb:'&#128203; Todos'},
+  {k:'alerta',  lb:'&#9888;&#65039; Por confirmar'},
+  {k:'',        lb:'&#9898; Por decidir'},
+  {k:'ligar',   lb:'&#128222; Ligar'},
+  {k:'semvaga', lb:'&#128308; Sem vaga'},
+  {k:'confirmado', lb:'&#9989; Confirmados'},
+  {k:'desistiu',   lb:'&#10006; Desistiram'}
+];
+var PED_DIAS = [
+  {k:'seg_qui', lb:'2&#170; e 5&#170;',  dias:[0,3]},
+  {k:'ter_sex', lb:'3&#170; e 6&#170;',  dias:[1,4]},
+  {k:'qua_sab', lb:'4&#170; e S&#225;b', dias:[2,5]},
+  {k:'seg', lb:'Segunda', dias:[0]},
+  {k:'ter', lb:'Ter&#231;a', dias:[1]},
+  {k:'qua', lb:'Quarta', dias:[2]},
+  {k:'qui', lb:'Quinta', dias:[3]},
+  {k:'sex', lb:'Sexta', dias:[4]},
+  {k:'sab', lb:'S&#225;bado', dias:[5]},
+  {k:'dom', lb:'Domingo', dias:[6]}
+];
+// Como as grafias do Excel são lidas. Serve a importação e a legenda do separador.
+var PED_NIV_MAP = [
+  {id:'ini', grafias:['inic','inic.','inici','inc','inc.','iniciacao','iniciação','ini']},
+  {id:'1c',  grafias:['c1','c 1','c01','c-1']},
+  {id:'2c',  grafias:['c2','c 2','c02','c-2']},
+  {id:'3c',  grafias:['c3','c 3','c03']},
+  {id:'1a',  grafias:['a1','a 1','a01']},
+  {id:'2a',  grafias:['a2','a 2','a02']},
+  {id:'beb', grafias:['bebes','bebe','bebé','bebés','bébes','bébés','b']},
+  {id:'hid', grafias:['hid','hid.','h','hidro','hidroginastica','hidroginástica']}
+];
+// Grafias que entram com alerta para o coordenador confirmar
+var PED_NIV_ALERTA = [
+  {id:'1a', grafias:['n1','n 1','n1º','n.1','n. 1','nat1','nat.1º','nat 1']},
+  {id:'2a', grafias:['n2','n 2','n2º','n.2','n. 2','nat2','nat 2']}
+];
+function pedEstadoInfo(k) {
+  for (var i=0;i<PED_ESTADOS.length;i++) if (PED_ESTADOS[i].k === (k||'')) return PED_ESTADOS[i];
+  return PED_ESTADOS[0];
+}
+function pedDiasDef(k) {
+  for (var i=0;i<PED_DIAS.length;i++) if (PED_DIAS[i].k === k) return PED_DIAS[i];
+  return null;
+}
+function pedDiasLabel(k) { var d = pedDiasDef(k); return d ? d.lb : '&mdash;'; }
+function getPedidos() { var d = getData(); if (!d.pedidos) d.pedidos = []; return d.pedidos; }
+function getPedidosDe(pool) {
+  var k = pool + '_' + BASE_YEARS[curEp];
+  if (!DB[k]) return [];
+  if (!DB[k].pedidos) DB[k].pedidos = [];
+  return DB[k].pedidos;
+}
+function pedPoolAtiva() { return pedPoolView && pedPoolView !== 'todas' ? pedPoolView : curPool; }
+// Pedidos da vista atual, cada um sabendo a que piscina pertence
+function pedidosDaVista() {
+  if (pedPoolView === 'todas') {
+    var out = [];
+    for (var i=0;i<POOLS.length;i++) {
+      var lst = getPedidosDe(POOLS[i].id);
+      for (var j=0;j<lst.length;j++) { lst[j]._pool = POOLS[i].id; out.push(lst[j]); }
+    }
+    return out;
+  }
+  var pool = pedPoolAtiva(), lst = getPedidosDe(pool);
+  for (var j=0;j<lst.length;j++) lst[j]._pool = pool;
+  return lst;
+}
+// Localiza um pedido pelo id, em qualquer piscina
+function acharPedido(id) {
+  for (var i=0;i<POOLS.length;i++) {
+    var lst = getPedidosDe(POOLS[i].id);
+    for (var j=0;j<lst.length;j++) if (lst[j].id === id) return {rec:lst[j], arr:lst, idx:j, pool:POOLS[i].id};
+  }
+  return null;
+}
+function pedPoolNome(id) {
+  for (var i=0;i<POOLS.length;i++) if (POOLS[i].id === id) return POOLS[i].name.replace(/^Piscina Municipal\s+(?:de\s+|da\s+|do\s+)?/i, '');
+  return id;
+}
+
+// ── Leitura do texto do Excel ──
+function pedNorm(s) {
+  return String(s==null?'':s).replace(/ /g,' ').replace(/\s+/g,' ').trim();
+}
+function pedNivel(txt) {
+  var bruto = pedNorm(txt);
+  var t = bruto.toLowerCase().replace(/\s+/g,'');
+  if (!t) return {id:'', txt:'', alerta:true};
+  for (var i=0;i<PED_NIV_MAP.length;i++) {
+    var g = PED_NIV_MAP[i].grafias;
+    for (var j=0;j<g.length;j++) if (g[j].replace(/\s+/g,'') === t) return {id:PED_NIV_MAP[i].id, txt:'', alerta:false};
+  }
+  for (var i=0;i<PED_NIV_ALERTA.length;i++) {
+    var g = PED_NIV_ALERTA[i].grafias;
+    for (var j=0;j<g.length;j++) if (g[j].replace(/\s+/g,'') === t) return {id:PED_NIV_ALERTA[i].id, txt:bruto, alerta:true};
+  }
+  var m = t.match(/^(\d)º?$/);
+  if (m) return {id:'', txt:m[1], alerta:true};
+  return {id:'', txt:bruto, alerta:true};
+}
+function pedHoraNorm(hh, mm) {
+  var H = parseInt(hh,10); if (isNaN(H) || H > 23) return '';
+  var M = parseInt(mm,10); if (isNaN(M) || M > 59) return '';
+  return pad2(H) + 'H' + pad2(M);
+}
+function pedHoras(txt) {
+  var out = [], s = pedNorm(txt);
+  var re = /(\d{1,2})\s*[:hH.,]\s*(\d{2})/g, m;
+  while ((m = re.exec(s))) {
+    var v = pedHoraNorm(m[1], m[2]);
+    if (v && out.indexOf(v) < 0) out.push(v);
+  }
+  return out;
+}
+function pedGruposDias(txt) {
+  var t = pedNorm(txt).toUpperCase();
+  var out = [];
+  if (/4\s*[ªA]?\s*(?:E|\/|,|\s)+\s*S[AÁ]B/.test(t) || /S[AÁ]B\s*(?:E|\/)\s*4/.test(t)) out.push('qua_sab');
+  if (/2\s*[ªA]?\s*(?:E|\/|,|\s)+\s*5/.test(t) || /SEG\w*\s*E\s*QUI/.test(t)) out.push('seg_qui');
+  if (/3\s*[ªA]?\s*(?:E|\/|,|\s)+\s*6/.test(t) || /TER\w*\s*E\s*SEX/.test(t)) out.push('ter_sex');
+  if (out.length) return out;
+  var simples = [];
+  var mD = t.match(/\bDOM|DM\./); if (mD) simples.push({k:'dom', i:t.indexOf(mD[0])});
+  var mS = t.match(/S[AÁ]B/);     if (mS) simples.push({k:'sab', i:t.indexOf(mS[0])});
+  if (simples.length) {
+    simples.sort(function(a,b){ return a.i - b.i; });   // pela ordem em que aparecem no texto
+    for (var i=0;i<simples.length;i++) out.push(simples[i].k);
+    return out;
+  }
+  if (/\bSEG/.test(t)) out.push('seg');
+  if (/\bTER\b|\bTERÇ/.test(t)) out.push('ter');
+  if (/\bQUA/.test(t)) out.push('qua');
+  if (/\bQUI/.test(t)) out.push('qui');
+  if (/\bSEX/.test(t)) out.push('sex');
+  if (!out.length) {
+    if (/^\s*4\s*[ªA]/.test(t)) out.push('qua');
+    else if (/^\s*2\s*[ªA]/.test(t)) out.push('seg');
+    else if (/^\s*3\s*[ªA]/.test(t)) out.push('ter');
+    else if (/^\s*5\s*[ªA]/.test(t)) out.push('qui');
+    else if (/^\s*6\s*[ªA]/.test(t)) out.push('sex');
+  }
+  return out;
+}
+function pedPool(txt, fallback) {
+  var t = pedNorm(txt).toUpperCase();
+  if (/FELG/.test(t)) return 'felgueiras';
+  if (/LIXA/.test(t)) return 'lixa';
+  if (/ID[AÃ]ES|IDAES/.test(t)) return 'idaes';
+  return fallback || '';
+}
+// Devolve até 3 opções {dias, h1, h2, pool}
+function pedOpcoes(txt, poolFallback) {
+  var grupos = pedGruposDias(txt), horas = pedHoras(txt);
+  var pool = pedPool(txt, '');
+  var out = [];
+  if (!grupos.length) {
+    if (horas.length) { for (var i=0;i<horas.length && out.length<3;i++) out.push({dias:'', h1:horas[i], h2:'', pool:pool}); }
+    else if (pool) out.push({dias:'', h1:'', h2:'', pool:pool});   // pedido que só muda de piscina
+    return out;
+  }
+  if (grupos.length === 1) {
+    var g = grupos[0], def = pedDiasDef(g);
+    var doisTempos = (g === 'qua_sab');
+    if (doisTempos && horas.length >= 2) {
+      for (var i=0;i+1<horas.length && out.length<3;i+=2) out.push({dias:g, h1:horas[i], h2:horas[i+1], pool:pool});
+      if (!out.length) out.push({dias:g, h1:horas[0]||'', h2:'', pool:pool});
+    } else if (horas.length) {
+      for (var i=0;i<horas.length && out.length<3;i++) out.push({dias:g, h1:horas[i], h2:'', pool:pool});
+    } else out.push({dias:g, h1:'', h2:'', pool:pool});
+    return out;
+  }
+  for (var i=0;i<grupos.length && out.length<3;i++) {
+    out.push({dias:grupos[i], h1:horas[i] || horas[0] || '', h2:'', pool:pool});
+  }
+  return out;
+}
+function pedEstadoFromTxt(txt) {
+  var t = pedNorm(txt).toUpperCase();
+  if (!t) return '';
+  if (/SEM\s*VAGA|S\/\s*VAGA/.test(t)) return 'semvaga';
+  if (/DESIST|ANULAR|ANULOU/.test(t)) return 'desistiu';
+  if (/N[AÃ]O\s*ATENDEU/.test(t)) return 'naoatendeu';
+  if (/CONFIRMAD|ALTERADA|ALTERADO/.test(t)) return 'confirmado';
+  if (/LIGAR/.test(t)) return 'ligar';
+  return '';
+}
+function pedDataFromTxt(txt) {
+  var t = pedNorm(txt);
+  var m = t.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/);
+  if (!m) return '';
+  var dd = parseInt(m[1],10), mo = parseInt(m[2],10);
+  if (!dd || !mo || dd > 31 || mo > 12) return '';
+  var ano;
+  if (m[3]) { ano = parseInt(m[3],10); if (ano < 100) ano += 2000; }
+  else ano = (mo >= 9) ? BASE_YEARS[curEp] : BASE_YEARS[curEp] + 1;
+  return ano + '-' + pad2(mo) + '-' + pad2(dd);
+}
+
+// ── Vagas no Mapa de Ocupação ──
+function getOcupDataForPool(pool) {
+  var k = pool + '_' + BASE_YEARS[curEp];
+  if (!DB[k] || !DB[k].occupancy) return null;
+  var o = DB[k].occupancy;
+  if (!o.links) o.links = {};
+  return o;
+}
+function pedMesAtivo() {
+  if (ocupMonth) return ocupMonth;
+  var mm = getOccupMonths();
+  return mm.length ? mm[0] : '';
+}
+function pedVagasCell(pool, di, hora, niv, mes) {
+  var occ = getOcupDataForPool(pool);
+  if (!occ || !mes || !hora || !niv) return null;
+  var key = hora + '|' + di + '|' + niv;
+  if (occ.links && occ.links[key]) key = occ.links[key];
+  var sd = (occ[mes] || {})[key];
+  if (!sd || !sd.max) return null;
+  return Math.max(0, (sd.max||0) - (sd.alunos||0));
+}
+function pedVagasOpcao(ped, op, mes) {
+  if (!ped.nivel) return {estado:'sem-nivel'};
+  var def = pedDiasDef(op.dias);
+  if (!def) return {estado:'sem-dias'};
+  var pool = op.pool || ped.pool || curPool;
+  var det = [], algum = false, min = null;
+  for (var i=0;i<def.dias.length;i++) {
+    var hora = (i === 1 && op.h2) ? op.h2 : op.h1;
+    var v = pedVagasCell(pool, def.dias[i], hora, ped.nivel, mes);
+    det.push({di:def.dias[i], hora:hora, v:v});
+    if (v !== null) { algum = true; min = (min === null) ? v : Math.min(min, v); }
+  }
+  if (!algum) return {estado:'sem-dados', det:det};
+  return {estado: (min > 0 ? 'vagas' : 'cheia'), vagas:min, det:det, pool:pool};
+}
+function pedVagasBadge(ped, op, mes) {
+  var r = pedVagasOpcao(ped, op, mes);
+  var cor, txt;
+  if (r.estado === 'vagas')        { cor = '#2e7d32'; txt = '&#128994; ' + r.vagas + ' vaga' + (r.vagas === 1 ? '' : 's'); }
+  else if (r.estado === 'cheia')   { cor = '#c62828'; txt = '&#128308; sem vaga'; }
+  else if (r.estado === 'sem-nivel'){ cor = '#8a94a6'; txt = '&#9898; n&#237;vel por definir'; }
+  else if (r.estado === 'sem-dias'){ cor = '#8a94a6'; txt = '&#9898; dias por definir'; }
+  else                             { cor = '#8a94a6'; txt = '&#9898; sem dados no mapa'; }
+  return '<span style="color:'+cor+';font-weight:700;font-size:.72rem;white-space:nowrap">'+txt+'</span>';
+}
+function pedOpcaoTxt(op) {
+  var s = pedDiasLabel(op.dias);
+  if (op.h1) s += ' &middot; ' + op.h1;
+  if (op.h2) s += '/' + op.h2;
+  if (op.pool && op.pool !== curPool) {
+    for (var i=0;i<POOLS.length;i++) if (POOLS[i].id === op.pool) s += ' <em style="color:#6a1b9a">(' + POOLS[i].name.replace('Piscina Municipal ','') + ')</em>';
+  }
+  return s;
+}
+function pedNivelTxt(p) {
+  if (p.nivel) return nLevel(p.nivel).full;
+  if (p.nivelTxt) return p.nivelTxt;
+  return '';
+}
+
+
+// ── Separador ──
+function switchPedFiltro(k) { pedFiltro = k; renderPedTab(); }
+function switchPedPool(k) { pedPoolView = k; renderPedTab(); }
+function buildPedPoolBtns() {
+  var atual = pedPoolView || curPool;
+  var html = '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">';
+  for (var i=0;i<POOLS.length;i++) {
+    var n = getPedidosDe(POOLS[i].id).length;
+    var on = (atual === POOLS[i].id);
+    html += '<button class="btn bsm '+(on?'bp':'bo')+'" data-pedp="'+POOLS[i].id+'">&#127946; '+escapeHTML(pedPoolNome(POOLS[i].id))+' <span style="opacity:.75;font-weight:400">('+n+')</span></button>';
+  }
+  var tot = 0;
+  for (var i=0;i<POOLS.length;i++) tot += getPedidosDe(POOLS[i].id).length;
+  html += '<button class="btn bsm '+(pedPoolView==='todas'?'bp':'bo')+'" data-pedp="todas">&#127758; Todas <span style="opacity:.75;font-weight:400">('+tot+')</span></button>';
+  html += '</div>';
+  return html;
+}
+function collectPedidos() {
+  var arr = pedidosDaVista().slice();
+  var q = (pedSearch||'').toLowerCase();
+  return arr.filter(function(r){
+    if (pedFiltro === 'alerta') { if (!r.alerta) return false; }
+    else if (pedFiltro !== 'todos') { if ((r.estado||'') !== pedFiltro) return false; }
+    if (q) {
+      var hay = ((r.nome||'')+' '+(r.numUtente||'')+' '+(r.tel||'')+' '+(r.obs||'')).toLowerCase();
+      if (hay.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+}
+function renderPedTab() {
+  var tabs = document.getElementById('pedSubtabs');
+  if (tabs) {
+    var th = '';
+    for (var i=0;i<PED_FILTROS.length;i++) {
+      var n = 0, all = pedidosDaVista();
+      for (var j=0;j<all.length;j++) {
+        if (PED_FILTROS[i].k === 'todos') n++;
+        else if (PED_FILTROS[i].k === 'alerta') { if (all[j].alerta) n++; }
+        else if ((all[j].estado||'') === PED_FILTROS[i].k) n++;
+      }
+      th += '<button class="subtab'+(PED_FILTROS[i].k===pedFiltro?' active':'')+'" data-pedf="'+PED_FILTROS[i].k+'">'+PED_FILTROS[i].lb+' <span style="opacity:.7;font-weight:400">('+n+')</span></button>';
+    }
+    tabs.innerHTML = th;
+    var bs = tabs.querySelectorAll('[data-pedf]');
+    for (var i=0;i<bs.length;i++) (function(b){ b.onclick = function(){ switchPedFiltro(b.getAttribute('data-pedf')); }; })(bs[i]);
+  }
+  var box = document.getElementById('ped-box'); if (!box) return;
+  var mes = pedMesAtivo(), pts = mes ? mes.split('-') : null;
+  var html = buildPedPoolBtns();
+  html += '<div style="display:flex;gap:.65rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem">';
+  html += '<button class="btn bp bsm" id="ped-add">&#10133; Adicionar</button>';
+  html += '<button class="btn bo bsm" id="ped-imp">&#128229; Importar Excel</button>';
+  html += '<input type="text" id="ped-search" placeholder="&#128269; Pesquisar nome, n&#186; utente ou telefone" value="'+escapeHTML(pedSearch)+'" style="margin-left:auto;max-width:300px;padding:.4rem .6rem;border:1px solid #cfd8e3;border-radius:6px;font-size:.84rem">';
+  html += '</div>';
+  if (pts) html += '<div style="font-size:.8rem;color:var(--g7);margin-bottom:.8rem">Vagas lidas do Mapa de Ocupa&#231;&#227;o de <strong>'+MES_NAMES[parseInt(pts[1],10)-1]+' '+pts[0]+'</strong> &mdash; muda o m&#234;s no separador Mapa de Ocupa&#231;&#227;o para consultar outro.</div>';
+  html += '<div id="ped-summary" style="margin-bottom:1rem"></div>';
+  html += '<div id="ped-table" style="overflow-x:auto"></div>';
+  box.innerHTML = html;
+  var pb = box.querySelectorAll('[data-pedp]');
+  for (var i=0;i<pb.length;i++) (function(b){ b.onclick = function(){ switchPedPool(b.getAttribute('data-pedp')); }; })(pb[i]);
+  var ab = document.getElementById('ped-add'); if (ab) ab.onclick = function(){ openPedModal(null); };
+  var ib = document.getElementById('ped-imp'); if (ib) ib.onclick = function(){ openPedImpModal(); };
+  var sb = document.getElementById('ped-search'); if (sb) sb.oninput = function(){ pedSearch = sb.value; refreshPedData(); };
+  refreshPedData();
+  renderPedLegenda();
+}
+function refreshPedData() {
+  var list = collectPedidos();
+  var s = document.getElementById('ped-summary'); if (s) s.innerHTML = buildPedSummaryHTML(list);
+  var t = document.getElementById('ped-table'); if (!t) return;
+  t.innerHTML = buildPedTableHTML(list, true);
+  var bs = t.querySelectorAll('button[data-pid]');
+  for (var i=0;i<bs.length;i++) (function(b){ b.onclick = function(){ openPedModal(b.getAttribute('data-pid')); }; })(bs[i]);
+  var fs = t.querySelectorAll('[data-pfield]');
+  for (var i=0;i<fs.length;i++) (function(el){
+    var ev = (el.tagName === 'SELECT') ? 'onchange' : 'onblur';
+    el[ev] = function() {
+      var id = el.getAttribute('data-pid2'), f = el.getAttribute('data-pfield');
+      var loc = acharPedido(id);
+      if (loc) {
+        loc.rec[f] = el.value;
+        if (f === 'estado' && el.value && !loc.rec.dataEstado) loc.rec.dataEstado = todayISO();
+      }
+      commit();
+      if (f === 'estado') renderPedTab(); else refreshPedData();
+    };
+  })(fs[i]);
+}
+function buildPedSummaryHTML(list) {
+  var alerta = 0, semvaga = 0, conf = 0, pend = 0;
+  for (var i=0;i<list.length;i++) {
+    if (list[i].alerta) alerta++;
+    var e = list[i].estado || '';
+    if (e === 'semvaga') semvaga++;
+    else if (e === 'confirmado') conf++;
+    else if (!e || e === 'ligar') pend++;
+  }
+  var card = function(l,v,c) {
+    return '<div class="card" style="flex:1;min-width:120px;text-align:center;margin:0;padding:.65rem">'
+      + '<div style="font-size:.62rem;color:var(--g4);font-weight:700;text-transform:uppercase;letter-spacing:.03em">'+l+'</div>'
+      + '<div style="font-size:1.5rem;font-weight:700;color:'+c+'">'+v+'</div></div>';
+  };
+  var html = '<div style="display:flex;gap:.75rem;flex-wrap:wrap">';
+  html += card('Pedidos', list.length, '#0a3d6b');
+  html += card('Por tratar', pend, '#e65100');
+  html += card('Sem vaga', semvaga, '#c62828');
+  html += card('Confirmados', conf, '#2e7d32');
+  html += card('&#9888;&#65039; Por confirmar', alerta, '#b26a00');
+  html += '</div>';
+  return html;
+}
+function buildPedTableHTML(list, withEdit) {
+  if (!list.length) return '<p style="color:var(--g4)">Sem pedidos nesta vista.</p>';
+  var mes = pedMesAtivo();
+  var html = '<table class="sg" style="min-width:1250px;font-size:.78rem">';
+  var verPool = (pedPoolView === 'todas');
+  html += '<tr><th style="width:30px"></th>'+(verPool?'<th>Piscina</th>':'')+'<th>N&#186; Utente</th><th>Nome</th><th>Telefone</th><th>N&#237;vel</th>'
+        + '<th>Turma atual</th><th>Pretende &mdash; vagas</th><th>Estado</th><th>Data</th><th>Observa&#231;&#245;es</th>'+(withEdit?'<th></th>':'')+'</tr>';
+  for (var i=0;i<list.length;i++) {
+    var r = list[i], est = pedEstadoInfo(r.estado), id = escapeHTML(r.id);
+    html += '<tr'+(r.alerta?' style="background:#fff8e1"':'')+'>';
+    html += '<td style="text-align:center">'+(r.alerta?'<span title="Por confirmar" style="font-size:1rem">&#9888;&#65039;</span>':'')+'</td>';
+    if (verPool) html += '<td style="white-space:nowrap;font-size:.72rem;font-weight:700;color:#6a1b9a">'+escapeHTML(pedPoolNome(r._pool || r.pool || ''))+'</td>';
+    html += '<td style="white-space:nowrap">'+escapeHTML(r.numUtente||'')+'</td>';
+    html += '<td style="text-align:left;font-weight:600">'+escapeHTML(r.nome||'')
+          + '</td>';
+    html += '<td style="white-space:nowrap">'+(r.tel?'<a href="tel:'+escapeHTML(String(r.tel).replace(/\s/g,''))+'" style="color:#1565c0;font-weight:600;text-decoration:none">'+escapeHTML(r.tel)+'</a>':'')+'</td>';
+    var nv = pedNivelTxt(r);
+    html += '<td style="white-space:nowrap">'+(r.nivel
+            ? '<span style="background:'+lvlColor(r.nivel)+';color:'+(lvlTextCls(r.nivel)?'#222':'#fff')+';padding:1px 6px;border-radius:3px;font-size:.68rem;font-weight:700">'+escapeHTML(nLevel(r.nivel).lb)+'</span>'
+            : '<span style="color:#b26a00;font-weight:700">'+escapeHTML(nv||'?')+'</span>')+'</td>';
+    html += '<td style="white-space:nowrap">'+pedDiasLabel(r.atualDias)+(r.atualH1?' &middot; '+r.atualH1:'')+(r.atualH2?'/'+r.atualH2:'')
+          + (r.atualTxt?'<div style="font-size:.66rem;color:#999">'+escapeHTML(r.atualTxt)+'</div>':'')+'</td>';
+    var ops = r.opcoes || [];
+    var oh = '';
+    for (var j=0;j<ops.length;j++) {
+      oh += '<div style="margin-bottom:.15rem">'+pedOpcaoTxt(ops[j])+' &nbsp;'+pedVagasBadge(r, ops[j], mes)+'</div>';
+    }
+    if (!oh) oh = '<span style="color:#b26a00;font-weight:700">por definir</span>';
+    if (r.pretTxt) oh += '<div style="font-size:.66rem;color:#999">'+escapeHTML(r.pretTxt)+'</div>';
+    html += '<td style="text-align:left">'+oh+'</td>';
+    if (withEdit) {
+      var sel = '<select data-pfield="estado" data-pid2="'+id+'" style="font-size:.74rem;padding:.2rem;border:1px solid #cfd8e3;border-radius:4px;font-weight:700;color:'+est.c+'">';
+      for (var j=0;j<PED_ESTADOS.length;j++) sel += '<option value="'+PED_ESTADOS[j].k+'"'+((r.estado||'')===PED_ESTADOS[j].k?' selected':'')+'>'+PED_ESTADOS[j].lb+'</option>';
+      sel += '</select>';
+      html += '<td>'+sel+'</td>';
+      html += '<td><input type="date" data-pfield="dataEstado" data-pid2="'+id+'" value="'+(r.dataEstado||'')+'" style="font-size:.74rem;padding:.2rem;border:1px solid #cfd8e3;border-radius:4px"></td>';
+      html += '<td><textarea data-pfield="obs" data-pid2="'+id+'" rows="2" style="width:190px;font-size:.72rem;padding:.25rem;border:1px solid #cfd8e3;border-radius:4px;resize:vertical">'+escapeHTML(r.obs||'')+'</textarea></td>';
+      html += '<td style="white-space:nowrap"><button class="btn bo bsm" data-pid="'+id+'">&#9998;</button></td>';
+    } else {
+      html += '<td style="white-space:nowrap;font-weight:700;color:'+est.c+'">'+est.lb+'</td>';
+      html += '<td style="white-space:nowrap">'+(r.dataEstado?fmtDate(r.dataEstado):'')+'</td>';
+      html += '<td style="text-align:left;font-size:.74rem;color:#555">'+escapeHTML(r.obs||'')+'</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  return html;
+}
+// ── Legenda ──
+function renderPedLegenda() {
+  var box = document.getElementById('ped-legenda'); if (!box) return;
+  var html = '<div class="card" style="margin-top:1.5rem">';
+  html += '<h3 style="margin-top:0;font-size:.95rem;color:#0a3d6b">&#128218; Como s&#227;o lidos os n&#237;veis do Excel</h3>';
+  html += '<div style="overflow-x:auto"><table class="sg" style="font-size:.76rem;min-width:520px">';
+  html += '<tr><th>Grafias no Excel</th><th>N&#237;vel atribu&#237;do</th><th>Alerta</th></tr>';
+  for (var i=0;i<PED_NIV_MAP.length;i++) {
+    var m = PED_NIV_MAP[i], nv = nLevel(m.id);
+    html += '<tr><td style="text-align:left"><code>'+m.grafias.join('</code> <code>')+'</code></td>';
+    html += '<td style="white-space:nowrap"><span style="background:'+lvlColor(m.id)+';color:'+(lvlTextCls(m.id)?'#222':'#fff')+';padding:1px 6px;border-radius:3px;font-size:.68rem;font-weight:700">'+escapeHTML(nv.lb)+'</span> '+escapeHTML(nv.full)+'</td>';
+    html += '<td style="text-align:center;color:#2e7d32">n&#227;o</td></tr>';
+  }
+  for (var i=0;i<PED_NIV_ALERTA.length;i++) {
+    var m = PED_NIV_ALERTA[i], nv = nLevel(m.id);
+    html += '<tr style="background:#fff8e1"><td style="text-align:left"><code>'+m.grafias.join('</code> <code>')+'</code></td>';
+    html += '<td style="white-space:nowrap"><span style="background:'+lvlColor(m.id)+';color:'+(lvlTextCls(m.id)?'#222':'#fff')+';padding:1px 6px;border-radius:3px;font-size:.68rem;font-weight:700">'+escapeHTML(nv.lb)+'</span> '+escapeHTML(nv.full)+'</td>';
+    html += '<td style="text-align:center">&#9888;&#65039; sim</td></tr>';
+  }
+  html += '<tr style="background:#fff8e1"><td style="text-align:left"><code>1</code> <code>1&#186;</code> <code>2</code> <code>2&#186;</code> <code>3</code></td>'
+       +  '<td>Fica s&#243; o n&#250;mero, <strong>sem modalidade</strong></td><td style="text-align:center">&#9888;&#65039; sim</td></tr>';
+  html += '<tr style="background:#fff8e1"><td style="text-align:left"><em>c&#233;lula vazia</em> ou grafia desconhecida</td>'
+       +  '<td>Fica vazio, com o texto original guardado</td><td style="text-align:center">&#9888;&#65039; sim</td></tr>';
+  html += '</table></div>';
+  html += '<div style="font-size:.78rem;color:#555;margin-top:.8rem;line-height:1.5">'
+       +  '<strong>Linhas a amarelo com &#9888;&#65039;</strong> s&#227;o as que precisam da tua confirma&#231;&#227;o. Abre a ficha (&#9998;) e corrige o que for preciso &mdash; todos os campos s&#227;o edit&#225;veis. '
+       +  'No campo do n&#237;vel podes escolher da lista ou usar a &#250;ltima op&#231;&#227;o, <em>Outro (texto livre)</em>; nesse caso o pedido deixa de ser cruzado com o Mapa de Ocupa&#231;&#227;o.'
+       +  '</div>';
+  html += '<div style="font-size:.78rem;color:#555;margin-top:.6rem;line-height:1.5">'
+       +  '<strong>Semáforo das vagas:</strong> &#128994; h&#225; vagas &nbsp;&middot;&nbsp; &#128308; turma cheia &nbsp;&middot;&nbsp; &#9898; sem dados no Mapa de Ocupa&#231;&#227;o para esse hor&#225;rio/n&#237;vel, ou n&#237;vel/dias ainda por definir. '
+       +  'Nas turmas 2x/semana emparelhadas com &#128279;, os n&#250;meros s&#227;o lidos da c&#233;lula de origem.'
+       +  '</div>';
+  html += '</div>';
+  box.innerHTML = html;
+}
+
+
+// ── Ficha do pedido ──
+function pedDiasOptions(sel) {
+  var o = '<option value="">-- por definir --</option>';
+  for (var i=0;i<PED_DIAS.length;i++) o += '<option value="'+PED_DIAS[i].k+'"'+(PED_DIAS[i].k===sel?' selected':'')+'>'+PED_DIAS[i].lb+'</option>';
+  return o;
+}
+function pedPoolOptions(sel) {
+  var o = '<option value="">(mesma piscina)</option>';
+  for (var i=0;i<POOLS.length;i++) o += '<option value="'+POOLS[i].id+'"'+(POOLS[i].id===sel?' selected':'')+'>'+escapeHTML(POOLS[i].name)+'</option>';
+  return o;
+}
+function renderPedOpcoes(ops) {
+  var box = document.getElementById('pedOpcoesBox'); if (!box) return;
+  var html = '';
+  for (var i=0;i<3;i++) {
+    var op = ops[i] || {dias:'', h1:'', h2:'', pool:''};
+    html += '<div style="border:1px solid #e0e6ef;border-radius:8px;padding:.6rem;margin-bottom:.6rem">';
+    html += '<div style="font-size:.72rem;font-weight:700;color:#2e7d32;margin-bottom:.35rem">Op&#231;&#227;o '+(i+1)+'</div>';
+    html += '<div class="fr fc2">';
+    html += '<div class="fg"><label>Dias</label><select id="pedOpDias'+i+'">'+pedDiasOptions(op.dias)+'</select></div>';
+    html += '<div class="fg"><label>Hora</label><input type="text" id="pedOpH1'+i+'" value="'+escapeHTML(op.h1||'')+'" placeholder="ex: 18H10"></div>';
+    html += '</div><div class="fr fc2">';
+    html += '<div class="fg"><label>Hora do 2&#186; dia</label><input type="text" id="pedOpH2'+i+'" value="'+escapeHTML(op.h2||'')+'" placeholder="ex: 09H50"></div>';
+    html += '<div class="fg"><label>Piscina</label><select id="pedOpPool'+i+'">'+pedPoolOptions(op.pool)+'</select></div>';
+    html += '</div></div>';
+  }
+  box.innerHTML = html;
+}
+function lerPedOpcoes() {
+  var out = [];
+  for (var i=0;i<3;i++) {
+    var d = document.getElementById('pedOpDias'+i).value;
+    var h1 = pedNorm(document.getElementById('pedOpH1'+i).value).toUpperCase().replace(/[:.]/,'H');
+    var h2 = pedNorm(document.getElementById('pedOpH2'+i).value).toUpperCase().replace(/[:.]/,'H');
+    var pl = document.getElementById('pedOpPool'+i).value;
+    if (!d && !h1 && !h2) continue;
+    out.push({dias:d, h1:h1, h2:h2, pool:pl});
+  }
+  return out;
+}
+function onPedNivelChange() {
+  var v = document.getElementById('pedNivel').value;
+  var txt = document.getElementById('pedNivelTxt').value;
+  // mostra a caixa de texto no modo livre, e também quando há texto do Excel por confirmar
+  document.getElementById('pedNivelTxtWrap').style.display = (v === '__livre' || (!v && txt)) ? '' : 'none';
+  var lbl = document.getElementById('pedNivelTxtLbl');
+  if (lbl) lbl.innerHTML = (v === '__livre') ? 'Escrever o n&#237;vel' : 'Texto original do Excel (por confirmar)';
+}
+function openPedModal(id) {
+  editPedId = id;
+  var selN = document.getElementById('pedNivel');
+  var o = '<option value="">-- por definir --</option>';
+  for (var i=0;i<NVL.length;i++) if (!NVL[i].acad) o += '<option value="'+NVL[i].id+'">'+escapeHTML(NVL[i].full)+'</option>';
+  o += '<option value="__livre">Outro (texto livre)</option>';
+  selN.innerHTML = o;
+  var selE = document.getElementById('pedEstado');
+  var oe = '';
+  for (var i=0;i<PED_ESTADOS.length;i++) oe += '<option value="'+PED_ESTADOS[i].k+'">'+PED_ESTADOS[i].lb+'</option>';
+  selE.innerHTML = oe;
+  document.getElementById('pedAtualDias').innerHTML = pedDiasOptions('');
+
+  var r = null, loc = id ? acharPedido(id) : null;
+  if (loc) r = loc.rec;
+  document.getElementById('mPedTitle').textContent = r ? ('Editar Pedido — ' + pedPoolNome(loc.pool)) : ('Novo Pedido — ' + pedPoolNome(pedPoolAtiva()));
+  document.getElementById('pedDelBtn').style.display = r ? 'inline-flex' : 'none';
+  document.getElementById('pedNum').value = r ? (r.numUtente||'') : '';
+  document.getElementById('pedNome').value = r ? (r.nome||'') : '';
+  document.getElementById('pedTel').value = r ? (r.tel||'') : '';
+  document.getElementById('pedQuem').value = r ? (r.quem||'') : '';
+  document.getElementById('pedNivelTxt').value = r ? (r.nivelTxt||'') : '';
+  selN.value = r ? (r.nivel || '') : '';
+  onPedNivelChange();
+  document.getElementById('pedAtualDias').value = r ? (r.atualDias||'') : '';
+  document.getElementById('pedAtualH1').value = r ? (r.atualH1||'') : '';
+  document.getElementById('pedAtualH2').value = r ? (r.atualH2||'') : '';
+  document.getElementById('pedAtualTxt').value = r ? (r.atualTxt||'') : '';
+  document.getElementById('pedPretTxt').value = r ? (r.pretTxt||'') : '';
+  renderPedOpcoes(r ? (r.opcoes||[]) : []);
+  selE.value = r ? (r.estado||'') : '';
+  document.getElementById('pedData').value = r ? (r.dataEstado||'') : '';
+  document.getElementById('pedObs').value = r ? (r.obs||'') : '';
+  document.getElementById('pedAlerta').checked = r ? !!r.alerta : false;
+  document.getElementById('mPed').classList.add('open');
+}
+function closePedModal() { document.getElementById('mPed').classList.remove('open'); editPedId = null; }
+function savePedido() {
+  var nome = pedNorm(document.getElementById('pedNome').value);
+  var num = pedNorm(document.getElementById('pedNum').value);
+  if (!nome && !num) { alert('Indica pelo menos o nome ou o nº de utente.'); return; }
+  var nv = document.getElementById('pedNivel').value;
+  var loc0 = editPedId ? acharPedido(editPedId) : null;
+  var r0 = loc0 ? loc0.rec : null;
+  var rec = {
+    id: editPedId || ('ped_' + Date.now() + '_' + Math.random().toString(36).slice(2,7)),
+    numUtente: num, nome: nome,
+    tel: pedNorm(document.getElementById('pedTel').value),
+    quem: pedNorm(document.getElementById('pedQuem').value),
+    pool: r0 ? (r0.pool || loc0.pool) : pedPoolAtiva(),
+    nivel: (nv === '__livre') ? '' : nv,
+    // no modo livre guarda o que foi escrito; com nível escolhido limpa; por definir mantém o texto do Excel
+    nivelTxt: (nv === '__livre' || !nv) ? pedNorm(document.getElementById('pedNivelTxt').value) : '',
+    atualDias: document.getElementById('pedAtualDias').value,
+    atualH1: pedNorm(document.getElementById('pedAtualH1').value).toUpperCase().replace(/[:.]/,'H'),
+    atualH2: pedNorm(document.getElementById('pedAtualH2').value).toUpperCase().replace(/[:.]/,'H'),
+    atualTxt: r0 ? (r0.atualTxt||'') : '',
+    pretTxt: r0 ? (r0.pretTxt||'') : '',
+    opcoes: lerPedOpcoes(),
+    estado: document.getElementById('pedEstado').value,
+    dataEstado: document.getElementById('pedData').value,
+    obs: pedNorm(document.getElementById('pedObs').value),
+    alerta: document.getElementById('pedAlerta').checked
+  };
+  if (loc0) loc0.arr[loc0.idx] = rec;
+  else {
+    var destino = pedPoolAtiva(), k = destino + '_' + BASE_YEARS[curEp];
+    if (!DB[k]) DB[k] = {professors:[], schedule:{}, weekHoras:[], satHoras:[], sunHoras:[]};
+    if (!DB[k].pedidos) DB[k].pedidos = [];
+    DB[k].pedidos.push(rec);
+  }
+  commit(); closePedModal(); renderPedTab(); toast('✓ Pedido guardado');
+}
+function deletePedido() {
+  if (!editPedId) return;
+  if (!confirm('Eliminar este pedido?')) return;
+  var loc = acharPedido(editPedId);
+  if (loc) loc.arr.splice(loc.idx, 1);
+  commit(); closePedModal(); renderPedTab(); toast('🗑 Pedido eliminado');
+}
+
+// ── Importação ──
+function pedPoolDaFolha(nome) {
+  var t = pedNorm(nome).toUpperCase();
+  if (/FELG/.test(t)) return 'felgueiras';
+  if (/LIXA/.test(t)) return 'lixa';
+  if (/ID[AÃ]ES|IDAES/.test(t)) return 'idaes';
+  return '';
+}
+function openPedImpModal() {
+  pedImpRows = [];
+  document.getElementById('pedImpTxt').value = '';
+  document.getElementById('pedImpFile').value = '';
+  document.getElementById('pedImpPreview').innerHTML = '';
+  document.getElementById('pedImpOkBtn').style.display = 'none';
+  var sp = document.getElementById('pedImpPool');
+  var o = '';
+  for (var i=0;i<POOLS.length;i++) o += '<option value="'+POOLS[i].id+'"'+(POOLS[i].id===curPool?' selected':'')+'>'+escapeHTML(POOLS[i].name)+'</option>';
+  sp.innerHTML = o;
+  var f = document.getElementById('pedImpFile');
+  f.onchange = function(){ pedImpLerFicheiro(f); };
+  document.getElementById('mPedImp').classList.add('open');
+}
+function closePedImpModal() { document.getElementById('mPedImp').classList.remove('open'); pedImpRows = []; }
+function pedImpLerFicheiro(inp) {
+  var file = inp.files && inp.files[0]; if (!file) return;
+  if (typeof XLSX === 'undefined') { alert('Biblioteca Excel ainda a carregar. Tenta outra vez daqui a alguns segundos.'); return; }
+  var fr = new FileReader();
+  fr.onload = function(e) {
+    try {
+      var wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+      var todas = [];
+      for (var s=0;s<wb.SheetNames.length;s++) {
+        var nome = wb.SheetNames[s];
+        var rows = XLSX.utils.sheet_to_json(wb.Sheets[nome], {header:1, raw:false, defval:''});
+        var pool = pedPoolDaFolha(nome) || document.getElementById('pedImpPool').value;
+        todas = todas.concat(pedLerLinhas(rows, pool, nome));
+      }
+      pedImpRows = todas;
+      pedImpMostrar();
+    } catch (err) { alert('Não consegui ler o ficheiro: ' + err.message); }
+  };
+  fr.readAsArrayBuffer(file);
+}
+// Procura o cabeçalho e lê as linhas de uma folha
+function pedLerLinhas(rows, pool, folha) {
+  var map = null, out = [];
+  for (var i=0;i<rows.length;i++) {
+    var raw = rows[i] || [];
+    var cells = [];
+    for (var j=0;j<raw.length;j++) cells.push(pedNorm(raw[j]));
+    if (!map) {
+      var m = {}, hit = 0;
+      for (var j=0;j<cells.length;j++) {
+        var c = cells[j].toLowerCase().replace(/[º°]/g,'').trim();
+        if (!c) continue;
+        if (/utente/.test(c) && m.num === undefined) { m.num = j; hit++; }
+        else if (/^nome$/.test(c) && m.nome === undefined) { m.nome = j; hit++; }
+        else if (/turma\s*atual/.test(c) && m.atual === undefined) { m.atual = j; hit++; }
+        else if (/^n[ií]vel$/.test(c) && m.niv === undefined) { m.niv = j; hit++; }
+        else if (/pretendida/.test(c) && m.pret === undefined) { m.pret = j; hit++; }
+        else if (/contato|contacto|telem/.test(c) && m.tel === undefined) { m.tel = j; hit++; }
+        else if (/confirma/.test(c) && m.conf === undefined) { m.conf = j; hit++; }
+        else if (/quem insere|quem inseriu/.test(c) && m.quem === undefined) { m.quem = j; }
+      }
+      if (m.nome !== undefined && m.atual !== undefined && hit >= 3) { map = m; }
+      continue;
+    }
+    var g = function(k) { return (map[k] !== undefined && cells[map[k]] !== undefined) ? cells[map[k]] : ''; };
+    var nome = g('nome');
+    // o nome pode estar na coluna seguinte quando a célula está fundida
+    if (!nome && map.nome !== undefined) {
+      for (var j=map.nome; j<Math.min(map.nome+4, cells.length); j++) {
+        if (cells[j] && /[A-Za-zÀ-ÿ]{3}/.test(cells[j])) { nome = cells[j]; break; }
+      }
+    }
+    var num = g('num');
+    if (!nome && !num) continue;
+    if (/^nº|^n°|utente/i.test(nome)) continue;
+    var niv = pedNivel(g('niv'));
+    var atual = g('atual'), pret = g('pret'), conf = g('conf');
+    var opsA = pedOpcoes(atual, pool);
+    var ops = pedOpcoes(pret, pool);
+    var estado = pedEstadoFromTxt(conf);
+    var semDias = !ops.length || !ops[0].dias;
+    var semAtual = !opsA.length || !opsA[0].dias;
+    out.push({
+      use: true, folha: folha, pool: pool,
+      numUtente: num, nome: nome, tel: g('tel'), quem: g('quem'),
+      nivel: niv.id, nivelTxt: niv.txt,
+      atualDias: opsA.length ? opsA[0].dias : '', atualH1: opsA.length ? opsA[0].h1 : '', atualH2: opsA.length ? opsA[0].h2 : '',
+      atualTxt: atual, pretTxt: pret, opcoes: ops,
+      estado: estado, dataEstado: pedDataFromTxt(conf),
+      obs: conf, alerta: !!(niv.alerta || semDias || semAtual)
+    });
+  }
+  return out;
+}
+function pedImpAnalisar() {
+  var txt = document.getElementById('pedImpTxt').value;
+  if (!pedNorm(txt)) { if (!pedImpRows.length) { document.getElementById('pedImpPreview').innerHTML = '<p style="color:#c62828;font-size:.84rem">Carrega o ficheiro ou cola a tabela.</p>'; } else pedImpMostrar(); return; }
+  var rows = [];
+  var linhas = txt.split(/\r?\n/);
+  for (var i=0;i<linhas.length;i++) rows.push(linhas[i].split('\t'));
+  pedImpRows = pedLerLinhas(rows, document.getElementById('pedImpPool').value, 'colado');
+  pedImpMostrar();
+}
+function pedImpMostrar() {
+  var box = document.getElementById('pedImpPreview'), ok = document.getElementById('pedImpOkBtn');
+  if (!pedImpRows.length) {
+    box.innerHTML = '<p style="color:#c62828;font-size:.84rem">Não reconheci nenhum pedido. Confirma que a tabela tem as colunas Nome, Turma Atual, Nível e Turma Pretendida.</p>';
+    ok.style.display = 'none'; return;
+  }
+  var ex = getPedidos(), nAlerta = 0;
+  for (var i=0;i<pedImpRows.length;i++) {
+    var r = pedImpRows[i];
+    r.dup = false;
+    for (var j=0;j<ex.length;j++) {
+      if (ex[j].numUtente && r.numUtente && String(ex[j].numUtente) === String(r.numUtente)
+          && pedNorm(ex[j].pretTxt).toLowerCase() === pedNorm(r.pretTxt).toLowerCase()) { r.dup = true; r.use = false; break; }
+    }
+    if (r.alerta) nAlerta++;
+  }
+  var porFolha = {};
+  for (var i=0;i<pedImpRows.length;i++) { var f = pedImpRows[i].folha || '?'; porFolha[f] = (porFolha[f]||0)+1; }
+  var resumo = [];
+  for (var f in porFolha) resumo.push(escapeHTML(f) + ': ' + porFolha[f]);
+  var html = '<div style="font-size:.84rem;font-weight:700;color:#0a3d6b;margin-bottom:.4rem">'+pedImpRows.length+' pedido(s) &mdash; '+resumo.join(' &middot; ')+'</div>';
+  html += '<div style="background:#fff8e1;border-left:4px solid #e65100;border-radius:6px;padding:.55rem .85rem;margin-bottom:.7rem;font-size:.79rem">'
+       +  '<strong>&#9888;&#65039; '+nAlerta+'</strong> pedido(s) ficam marcados para confirmares depois (n&#237;vel por definir ou hor&#225;rio que n&#227;o consegui ler). Entram na mesma &mdash; corriges na ficha de cada um.</div>';
+  html += '<div style="overflow-x:auto"><table class="sg" style="min-width:900px;font-size:.74rem">';
+  html += '<tr><th style="width:32px">&#10003;</th><th>Piscina</th><th>N&#186; Utente</th><th>Nome</th><th>N&#237;vel</th><th>Atual</th><th>Pretende</th><th>Estado</th><th></th></tr>';
+  for (var i=0;i<pedImpRows.length;i++) {
+    var r = pedImpRows[i];
+    html += '<tr'+(r.dup?' style="background:#f5f5f5"':(r.alerta?' style="background:#fff8e1"':''))+'>';
+    html += '<td><input type="checkbox" data-pir="'+i+'"'+(r.use?' checked':'')+'></td>';
+    html += '<td style="font-size:.7rem">'+escapeHTML(r.pool)+'</td>';
+    html += '<td>'+escapeHTML(r.numUtente||'')+'</td>';
+    html += '<td style="text-align:left">'+escapeHTML((r.nome||'').slice(0,28))+'</td>';
+    html += '<td style="white-space:nowrap">'+(r.nivel ? escapeHTML(nLevel(r.nivel).lb) : '<span style="color:#b26a00;font-weight:700">'+escapeHTML(r.nivelTxt||'?')+'</span>')+'</td>';
+    html += '<td style="white-space:nowrap">'+pedDiasLabel(r.atualDias)+(r.atualH1?' '+r.atualH1:'')+'</td>';
+    var ot = [];
+    for (var j=0;j<(r.opcoes||[]).length;j++) ot.push(pedDiasLabel(r.opcoes[j].dias)+(r.opcoes[j].h1?' '+r.opcoes[j].h1:''));
+    html += '<td style="text-align:left">'+(ot.length?ot.join('<br>'):'<span style="color:#b26a00;font-weight:700">por definir</span>')+'</td>';
+    html += '<td style="white-space:nowrap;color:'+pedEstadoInfo(r.estado).c+';font-weight:700">'+pedEstadoInfo(r.estado).lb+'</td>';
+    html += '<td style="font-size:.68rem;color:'+(r.dup?'#888':'#b26a00')+'">'+(r.dup?'j&#225; existe':(r.alerta?'&#9888;&#65039;':''))+'</td>';
+    html += '</tr>';
+  }
+  html += '</table></div>';
+  box.innerHTML = html;
+  var cbs = box.querySelectorAll('[data-pir]');
+  for (var i=0;i<cbs.length;i++) (function(el){
+    el.onchange = function(){ var k = parseInt(el.getAttribute('data-pir'),10); if (pedImpRows[k]) pedImpRows[k].use = el.checked; };
+  })(cbs[i]);
+  ok.style.display = 'inline-flex';
+  ok.textContent = 'Importar selecionados';
+}
+function pedImpConfirmar() {
+  var porPool = {}, n = 0;
+  for (var i=0;i<pedImpRows.length;i++) {
+    var r = pedImpRows[i];
+    if (!r.use) continue;
+    if (!porPool[r.pool]) porPool[r.pool] = [];
+    porPool[r.pool].push(r);
+  }
+  for (var pool in porPool) {
+    var k = pool + '_' + BASE_YEARS[curEp];
+    if (!DB[k]) DB[k] = {professors:[], schedule:{}, weekHoras:[], satHoras:[], sunHoras:[]};
+    if (!DB[k].pedidos) DB[k].pedidos = [];
+    var lista = porPool[pool];
+    for (var i=0;i<lista.length;i++) {
+      var r = lista[i];
+      DB[k].pedidos.push({
+        id: 'ped_' + Date.now() + '_' + n + '_' + Math.random().toString(36).slice(2,6),
+        numUtente: r.numUtente, nome: r.nome, tel: r.tel, quem: r.quem, pool: pool,
+        nivel: r.nivel, nivelTxt: r.nivelTxt,
+        atualDias: r.atualDias, atualH1: r.atualH1, atualH2: r.atualH2,
+        atualTxt: r.atualTxt, pretTxt: r.pretTxt, opcoes: r.opcoes || [],
+        estado: r.estado, dataEstado: r.dataEstado, obs: r.obs, alerta: !!r.alerta
+      });
+      n++;
+    }
+  }
+  if (!n) { alert('Não selecionaste nenhum pedido.'); return; }
+  commit(); closePedImpModal(); renderPedTab();
+  toast('✓ ' + n + ' pedido(s) importado(s)');
+}
+
+// ── Exportações ──
+function pedVistaLabel() {
+  if (pedPoolView === 'todas') return 'Todas as piscinas';
+  return pedPoolNome(pedPoolAtiva());
+}
+function buildPedidosHTML() {
+  var list = collectPedidos();
+  var html = '<div class="sub">' + pedVistaLabel() + ' &mdash; ' + list.length + ' pedido(s)</div>';
+  html += buildPedTableHTML(list, false);
+  return html;
+}
+function pedRowsForExport() {
+  var list = collectPedidos(), mes = pedMesAtivo();
+  var rows = [['Piscina','Nº Utente','Nome','Telefone','Nível','Turma atual','Pretende','Vagas','Estado','Data','Observações','Por confirmar']];
+  for (var i=0;i<list.length;i++) {
+    var r = list[i], ops = r.opcoes || [], ot = [], vt = [];
+    for (var j=0;j<ops.length;j++) {
+      ot.push(espPlain(pedDiasLabel(ops[j].dias)) + (ops[j].h1 ? ' ' + ops[j].h1 : '') + (ops[j].h2 ? '/' + ops[j].h2 : ''));
+      var v = pedVagasOpcao(r, ops[j], mes);
+      vt.push(v.estado === 'vagas' ? (v.vagas + ' vagas') : (v.estado === 'cheia' ? 'sem vaga' : 'sem dados'));
+    }
+    rows.push([espPlain(pedPoolNome(r._pool || r.pool || '')), r.numUtente||'', r.nome||'', r.tel||'',
+      r.nivel ? nLevel(r.nivel).full : (r.nivelTxt||''),
+      espPlain(pedDiasLabel(r.atualDias)) + (r.atualH1 ? ' ' + r.atualH1 : '') + (r.atualH2 ? '/' + r.atualH2 : ''),
+      ot.join(' | '), vt.join(' | '),
+      espPlain(pedEstadoInfo(r.estado).lb), r.dataEstado ? fmtDate(r.dataEstado) : '',
+      r.obs||'', r.alerta ? 'SIM' : '']);
+  }
+  return rows;
+}
+function exportPedidosExcel() {
+  if (typeof XLSX === 'undefined') { alert('Biblioteca Excel ainda a carregar. Tenta outra vez daqui a alguns segundos.'); return; }
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(pedRowsForExport()), 'Pedidos');
+  XLSX.writeFile(wb, exportFileBase() + '_pedidos_alteracao.xlsx');
 }
 
 // ═══ ENVIAR POR WHATSAPP ═══
