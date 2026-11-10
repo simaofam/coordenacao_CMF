@@ -8274,6 +8274,7 @@ function renderEsperaTab() {
   html += '<div style="display:flex;gap:.65rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem">';
   html += '<button class="btn bp bsm" id="esp-add">&#10133; Adicionar</button>';
   html += '<button class="btn bo bsm" id="esp-imp">&#128229; Importar do e@Sport</button>';
+  html += '<button class="btn bo bsm" id="esp-dedup">&#129529; Limpar duplicados</button>';
   html += '<input type="text" id="esp-search" placeholder="&#128269; Pesquisar nome ou telefone" value="'+escapeHTML(espSearch)+'" style="margin-left:auto;max-width:260px;padding:.4rem .6rem;border:1px solid #cfd8e3;border-radius:6px;font-size:.84rem">';
   html += '</div>';
   html += '<div id="esp-summary" style="margin-bottom:1rem"></div>';
@@ -8285,6 +8286,7 @@ function renderEsperaTab() {
   })(db[i]);
   var ab = document.getElementById('esp-add'); if (ab) ab.onclick = function(){ openEspModal(null); };
   var ib = document.getElementById('esp-imp'); if (ib) ib.onclick = function(){ openEspImpModal(); };
+  var dd = document.getElementById('esp-dedup'); if (dd) dd.onclick = function(){ espLimparDuplicados(); };
   var sb = document.getElementById('esp-search');
   if (sb) sb.oninput = function(){ espSearch = sb.value; refreshEsperaData(); };
   refreshEsperaData();
@@ -8793,6 +8795,95 @@ function espImpConfirmar() {
   if (n) msg.push(n + ' novo(s)');
   if (nu) msg.push(nu + ' completado(s)');
   toast('✓ ' + msg.join(' · '));
+}
+
+// ── Limpeza de duplicados ──
+function espTemNotas(r) {
+  return !!((r.dataContacto||'') || (r.estado||'') || (r.feedback||'') || (r.insHora||'') || (r.dataInscricao||''));
+}
+// Junta no registo "base" tudo o que só existe no "extra", sem apagar nada do base
+function espFundir(base, extra) {
+  var camposES = ['dias','horario','pos','cartao','email','tel','dataLista','cat'];
+  for (var i=0;i<camposES.length;i++) {
+    var c = camposES[i];
+    if ((extra[c]||'') && !(base[c]||'')) base[c] = extra[c];
+  }
+  if ((extra.dias||'') && !(base.dias||'')) base.dias = extra.dias;
+  if ((extra.horario||'') && !(base.horario||'')) base.horario = extra.horario;
+  var camposNotas = ['dataContacto','estado','feedback','pref','insHora','insDia','insNivel','dataInscricao'];
+  for (var i=0;i<camposNotas.length;i++) {
+    var c = camposNotas[i];
+    if ((extra[c]||'') && !(base[c]||'')) base[c] = extra[c];
+  }
+}
+// Plano de limpeza: que registos completar e quais remover
+function espPlanoDedup() {
+  var arr = getEspera();
+  var grupos = {}, i, j;
+  for (i=0;i<arr.length;i++) {
+    var r = arr[i];
+    var k = (r.nome||'').trim().toLowerCase() + '|' + espCleanPhone(r.tel||'');
+    if (k === '|') continue;
+    if (!grupos[k]) grupos[k] = [];
+    grupos[k].push(i);
+  }
+  var pares = [], remover = {}, comNotas = 0;
+  for (var k in grupos) {
+    var idx = grupos[k];
+    if (idx.length < 2) continue;
+    var inc = [], porHor = {}, ordemHor = [];
+    for (j=0;j<idx.length;j++) {
+      var rr = arr[idx[j]], hk = espHorarioShort(rr.horario).toLowerCase();
+      if (!hk && !rr.dias) { inc.push(idx[j]); continue; }
+      if (!porHor[hk]) { porHor[hk] = []; ordemHor.push(hk); }
+      porHor[hk].push(idx[j]);
+    }
+    // a) registos completos repetidos no mesmo horário — fica o primeiro
+    for (j=0;j<ordemHor.length;j++) {
+      var lst = porHor[ordemHor[j]];
+      for (var m=1;m<lst.length;m++) { pares.push({keep:lst[0], drop:lst[m]}); remover[lst[m]] = 1; }
+    }
+    // b) registos incompletos emparelham com os completos (um para um), ficando o incompleto
+    //    porque é o que traz as notas e a posição original na lista
+    for (j=0;j<inc.length && j<ordemHor.length;j++) {
+      pares.push({keep:inc[j], drop:porHor[ordemHor[j]][0]});
+      remover[porHor[ordemHor[j]][0]] = 1;
+    }
+    // c) incompletos a mais, sem notas, quando o grupo já ficou completo
+    if (ordemHor.length) {
+      for (j=ordemHor.length;j<inc.length;j++) {
+        if (espTemNotas(arr[inc[j]])) { comNotas++; continue; }
+        pares.push({keep:inc[0], drop:inc[j]});
+        remover[inc[j]] = 1;
+      }
+    }
+  }
+  return {pares:pares, remover:remover, nRemover:Object.keys(remover).length, comNotas:comNotas};
+}
+function espLimparDuplicados() {
+  var plano = espPlanoDedup();
+  if (!plano.nRemover) {
+    alert('Não encontrei registos duplicados nesta lista.');
+    return;
+  }
+  var arr = getEspera();
+  var msg = 'Encontrei ' + plano.nRemover + ' registo(s) duplicado(s).\n\n'
+    + 'Vou juntar cada par num só: o registo mais antigo fica (mantendo as tuas notas de contacto e a posição na lista) '
+    + 'e recebe os dados que faltavam — dias, horário, posição, nº de cartão e email.\n\n'
+    + 'Ficam ' + (arr.length - plano.nRemover) + ' registos (agora são ' + arr.length + ').\n\nContinuar?';
+  if (!confirm(msg)) return;
+  for (var i=0;i<plano.pares.length;i++) {
+    var pr = plano.pares[i];
+    if (arr[pr.keep] && arr[pr.drop]) espFundir(arr[pr.keep], arr[pr.drop]);
+  }
+  var novo = [];
+  for (var i=0;i<arr.length;i++) if (!plano.remover[i]) novo.push(arr[i]);
+  getData().espera = novo;
+  commit(); renderEsperaTab();
+  toast('\ud83e\uddf9 ' + plano.nRemover + ' duplicado(s) fundido(s)');
+  if (plano.comNotas) {
+    alert('Deixei ' + plano.comNotas + ' registo(s) repetido(s) por mexer porque tinham notas de contacto tuas. Verifica-os à mão.');
+  }
 }
 
 // ── Exportações ──
