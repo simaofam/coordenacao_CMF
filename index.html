@@ -840,6 +840,21 @@ code{background:rgba(0,0,0,.08);padding:.05rem .35rem;border-radius:3px;font-siz
 </div>
 </div>
 
+<!-- MODAL ENVIAR POR WHATSAPP -->
+<div class="mo" id="mWA">
+  <div class="md" style="width:min(460px,94vw)">
+    <div class="mh"><h3>&#128242; Enviar por WhatsApp</h3><button class="mc" onclick="closeWAModal()">&#215;</button></div>
+    <div class="mb">
+      <div id="waTitulo" style="font-size:.84rem;color:var(--g7);margin-bottom:1rem"></div>
+      <button class="btn bp" id="waBtnPdf" style="width:100%;justify-content:center;padding:.85rem;margin-bottom:.7rem;font-size:.92rem">&#128196; Enviar PDF</button>
+      <div style="font-size:.74rem;color:#888;margin:-.4rem 0 1rem;line-height:1.4">Gera o PDF e abre a partilha do telem&#243;vel, onde escolhes o WhatsApp e o contacto.</div>
+      <button class="btn bo" id="waBtnTxt" style="width:100%;justify-content:center;padding:.85rem;font-size:.92rem">&#128172; Enviar texto</button>
+      <div style="font-size:.74rem;color:#888;margin-top:.45rem;line-height:1.4">Abre o WhatsApp com um resumo j&#225; escrito, pronto a enviar.</div>
+      <div id="waAviso" style="display:none;background:#fff3e0;border-left:4px solid #e65100;border-radius:6px;padding:.6rem .85rem;margin-top:1rem;font-size:.78rem;color:#1a2332"></div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL FICHA DA LISTA DE ESPERA -->
 <div class="mo" id="mEsp">
   <div class="md" style="width:min(620px,96vw);max-height:92vh;overflow-y:auto">
@@ -3391,6 +3406,7 @@ function exportPDF(what) {
     if (what === 'academias' && curPool !== 'felgueiras') { alert('As Academias só existem na Piscina de Felgueiras.'); return; }
     var mapaTitle = what === 'academias' ? 'Mapa das Academias' : 'Mapa de Distribuição de Turmas';
     var mapaBody = buildMapaHTML(what === 'academias' ? getAcadData() : null);
+    if (waCapture) { waCapture.title = mapaTitle; waCapture.body = mapaBody; waCapture.wide = true; waCapture.got = true; return; }
     var logoEl = document.querySelector('.logo-img');
     var logoSrc2 = logoEl ? logoEl.src : '';
     var poolLabel = poolFullName ? poolFullName() : '';
@@ -3546,6 +3562,7 @@ function exportPDF(what) {
   exportPDFRaw(title, body, logoSrc);
 }
 function exportPDFRaw(title, body, logoSrc) {
+  if (waCapture) { waCapture.title = title; waCapture.body = body; waCapture.got = true; return; }
   if (logoSrc === undefined) {
     var logoEl = document.querySelector('.logo-img');
     logoSrc = logoEl ? logoEl.src : '';
@@ -8935,6 +8952,209 @@ function exportEsperaExcel() {
   XLSX.writeFile(wb, exportFileBase() + '_lista_espera.xlsx');
 }
 
+// ═══ ENVIAR POR WHATSAPP ═══
+// Reaproveita exatamente o mesmo conteúdo dos PDF: em vez de abrir a janela de
+// impressão, exportPDFRaw entrega o título e o corpo aqui.
+var waCapture = null;
+var waExpr = '';
+function waRecolhe(expr) {
+  waCapture = {title:'', body:'', wide:false, got:false};
+  try { (new Function(expr))(); } catch (e) { waCapture = null; return null; }
+  var c = waCapture; waCapture = null;
+  return c.got ? c : null;
+}
+function openWAFromExpr(expr) {
+  waExpr = expr;
+  var c = waRecolhe(expr);
+  if (!c) { return; }   // o próprio export já avisou (ex.: "Selecione um professor")
+  document.getElementById('waTitulo').innerHTML = '<strong>' + escapeHTML(c.title) + '</strong>';
+  document.getElementById('waAviso').style.display = 'none';
+  document.getElementById('mWA').classList.add('open');
+}
+function closeWAModal() { document.getElementById('mWA').classList.remove('open'); }
+function waAvisar(msg) {
+  var el = document.getElementById('waAviso');
+  if (el) { el.innerHTML = msg; el.style.display = 'block'; }
+}
+function waNomeFicheiro(title) {
+  return (exportFileBase() + '_' + title).replace(/[^A-Za-z0-9_\-]+/g,'_').replace(/_+/g,'_').slice(0,70);
+}
+
+// ── Texto ──
+function waCelula(el) {
+  var partes = [];
+  var junta = function(n) {
+    for (var i=0;i<n.childNodes.length;i++) {
+      var c = n.childNodes[i];
+      if (c.nodeType === 3) { var t = (c.nodeValue||'').replace(/\s+/g,' ').trim(); if (t) partes.push(t); }
+      else if (c.nodeType === 1) junta(c);
+    }
+  };
+  junta(el);
+  return partes.join(' ').replace(/\s+/g,' ').trim();
+}
+function waTabelaTexto(tb) {
+  var out = [], rows = tb.rows;
+  for (var i=0;i<rows.length;i++) {
+    var cells = rows[i].cells, parts = [], algum = false;
+    for (var j=0;j<cells.length;j++) {
+      var v = waCelula(cells[j]);
+      if (v) algum = true;
+      parts.push(v || '\u2013');   // mantém as vazias para não desalinhar as colunas
+    }
+    if (!algum) continue;
+    while (parts.length && parts[parts.length-1] === '\u2013') parts.pop();
+    if (!parts.length) continue;
+    out.push(rows[i].querySelector('th') ? ('*' + parts.join(' | ') + '*') : parts.join(' \u00b7 '));
+  }
+  return out;
+}
+function waCorpoTexto(body) {
+  var d = document.createElement('div');
+  d.innerHTML = body;
+  var inp = d.querySelectorAll('input,select,textarea,button');
+  for (var i=0;i<inp.length;i++) if (inp[i].parentNode) inp[i].parentNode.removeChild(inp[i]);
+  var out = [];
+  var walk = function(node) {
+    for (var i=0;i<node.childNodes.length;i++) {
+      var n = node.childNodes[i];
+      if (n.nodeType !== 1) continue;
+      var tag = n.tagName.toLowerCase();
+      if (tag === 'table') { out.push(''); out = out.concat(waTabelaTexto(n)); continue; }
+      if (/^h[1-6]$/.test(tag)) { var ht = waCelula(n); if (ht) { out.push(''); out.push('*' + ht + '*'); } continue; }
+      if (n.querySelector && (n.querySelector('table') || n.querySelector('h1,h2,h3,h4,h5,h6'))) { walk(n); continue; }
+      var t = waCelula(n);
+      if (t) out.push(t);
+    }
+  };
+  walk(d);
+  var limpo = [];
+  for (var i=0;i<out.length;i++) {
+    if (out[i] === '' && (limpo.length === 0 || limpo[limpo.length-1] === '')) continue;
+    limpo.push(out[i]);
+  }
+  return limpo.join('\n');
+}
+function waEnviarTexto() {
+  var c = waRecolhe(waExpr);
+  if (!c) { waAvisar('Não consegui preparar o conteúdo. Tenta pelo botão PDF.'); return; }
+  var cab = '*Escola Municipal de Natação de Felgueiras*\n' + c.title + '\n' + poolFullName() + ' \u00b7 Época ' + epocaName() + '\n';
+  var corpo = waCorpoTexto(c.body);
+  var txt = cab + corpo;
+  var LIM = 1700;
+  if (txt.length > LIM) txt = txt.slice(0, LIM).replace(/\n[^\n]*$/,'') + '\n\n_(lista cortada — o resto vai no PDF)_';
+  closeWAModal();
+  window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+}
+
+// ── PDF ──
+function waCarregarPDFLib(cb) {
+  if (typeof html2pdf !== 'undefined') { cb(true); return; }
+  var feito = false;
+  var uma = function(ok) { if (feito) return; feito = true; cb(ok); };
+  var s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+  s.onload = function(){ uma(typeof html2pdf !== 'undefined'); };
+  s.onerror = function(){ uma(false); };
+  document.head.appendChild(s);
+  setTimeout(function(){ uma(typeof html2pdf !== 'undefined'); }, 15000);
+}
+function waMontarFolha(c) {
+  var logoEl = document.querySelector('.logo-img');
+  var logo = logoEl ? logoEl.src : '';
+  var larg = c.wide ? 1500 : 820;
+  var box = document.createElement('div');
+  box.style.cssText = 'position:fixed;left:-10000px;top:0;width:'+larg+'px;background:#fff;padding:24px;font-family:Arial,sans-serif;color:#1a2332;';
+  box.innerHTML =
+    '<style>' +
+    '#wa-sheet table{width:100%;border-collapse:collapse;margin:.85rem 0;font-size:'+(c.wide?'10px':'12px')+';}' +
+    '#wa-sheet th{background:#0a3d6b;color:#fff;padding:6px;text-align:left;border:1px solid #1565c0;}' +
+    '#wa-sheet td{padding:5px;border:1px solid #ddd;vertical-align:top;background:#fff;}' +
+    '#wa-sheet tr:nth-child(even) td{background:#f7f9fc;}' +
+    '#wa-sheet h3{color:#0a3d6b;margin-top:16px;border-bottom:1.5px solid #e8ecf1;padding-bottom:4px;font-size:15px;}' +
+    '#wa-sheet .lvl{display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:bold;color:#fff;margin-right:3px;}' +
+    '#wa-sheet .lvl.dark{color:#222;}' +
+    '#wa-sheet input,#wa-sheet select,#wa-sheet textarea,#wa-sheet button{display:none;}' +
+    '</style>' +
+    '<div id="wa-sheet">' +
+    '<div style="display:flex;align-items:center;gap:14px;border-bottom:3px solid #00acc1;padding-bottom:10px;margin-bottom:14px">' +
+    (logo ? '<img src="'+logo+'" style="height:52px">' : '') +
+    '<div><div style="color:#0a3d6b;font-size:19px;font-weight:700">Escola Municipal de Natação de Felgueiras</div>' +
+    '<div style="color:#1565c0;font-size:14px">' + escapeHTML(c.title) + '</div></div></div>' +
+    '<div style="font-size:12px;color:#555;margin-bottom:10px">' + poolFullName() + ' &middot; Época ' + epocaName() + '</div>' +
+    c.body + '</div>';
+  document.body.appendChild(box);
+  return box;
+}
+function waEnviarPDF() {
+  var c = waRecolhe(waExpr);
+  if (!c) { waAvisar('Não consegui preparar o conteúdo.'); return; }
+  var btn = document.getElementById('waBtnPdf');
+  var txtOrig = btn.innerHTML;
+  btn.innerHTML = '&#9203; A preparar o PDF…'; btn.disabled = true;
+  var repor = function(){ btn.innerHTML = txtOrig; btn.disabled = false; };
+  waCarregarPDFLib(function(ok) {
+    if (!ok) { repor(); waAvisar('Não consegui carregar o gerador de PDF (precisa de internet). Usa o botão <strong>Enviar texto</strong>, ou o botão PDF normal e anexa à mão.'); return; }
+    var box = waMontarFolha(c);
+    var nome = waNomeFicheiro(c.title) + '.pdf';
+    html2pdf().set({
+      margin: 6,
+      filename: nome,
+      image: {type:'jpeg', quality:0.95},
+      html2canvas: {scale:2, useCORS:true, backgroundColor:'#ffffff'},
+      jsPDF: {unit:'mm', format:'a4', orientation: c.wide ? 'landscape' : 'portrait'}
+    }).from(box).outputPdf('blob').then(function(blob) {
+      if (box.parentNode) box.parentNode.removeChild(box);
+      repor();
+      waPartilhar(blob, nome, c.title);
+    })['catch'](function(e) {
+      if (box.parentNode) box.parentNode.removeChild(box);
+      repor();
+      waAvisar('Falhou a gerar o PDF: ' + (e && e.message ? e.message : 'erro desconhecido') + '. Usa o botão <strong>Enviar texto</strong>.');
+    });
+  });
+}
+function waPartilhar(blob, nome, titulo) {
+  var legenda = 'Escola Municipal de Natação de Felgueiras — ' + titulo;
+  var f = null;
+  try { f = new File([blob], nome, {type:'application/pdf'}); } catch (e) {}
+  if (f && navigator.canShare && navigator.canShare({files:[f]}) && navigator.share) {
+    navigator.share({files:[f], title:titulo, text:legenda}).then(function(){ closeWAModal(); })
+      ['catch'](function(err){ if (err && err.name === 'AbortError') return; waDescarregarEAbrir(blob, nome, legenda); });
+    return;
+  }
+  waDescarregarEAbrir(blob, nome, legenda);
+}
+function waDescarregarEAbrir(blob, nome, legenda) {
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = nome;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+  waAvisar('Este aparelho não deixa anexar ficheiros diretamente. Descarreguei o PDF <strong>' + escapeHTML(nome) + '</strong> — vou abrir o WhatsApp e é só anexá-lo na conversa.');
+  setTimeout(function(){ window.open('https://wa.me/?text=' + encodeURIComponent(legenda), '_blank'); }, 900);
+}
+
+// ── Acrescenta o botão a todos os grupos de exportação ──
+function wireWhatsAppButtons() {
+  var pdfs = document.querySelectorAll('.exp-btn.exp-pdf');
+  for (var i=0;i<pdfs.length;i++) {
+    var b = pdfs[i];
+    var grp = b.parentNode;
+    if (!grp || grp.getAttribute('data-wa') === '1') continue;
+    var expr = b.getAttribute('onclick');
+    if (!expr) continue;
+    grp.setAttribute('data-wa','1');
+    var wa = document.createElement('button');
+    wa.className = 'exp-btn exp-wa';
+    wa.style.cssText = 'background:#25D366;color:#fff';
+    wa.innerHTML = '&#128242; WhatsApp';
+    (function(e){ wa.onclick = function(){ openWAFromExpr(e); }; })(expr);
+    grp.appendChild(wa);
+  }
+  var bp = document.getElementById('waBtnPdf'); if (bp) bp.onclick = waEnviarPDF;
+  var bt = document.getElementById('waBtnTxt'); if (bt) bt.onclick = waEnviarTexto;
+}
+
 // ═══ INIT ═══
 (function() {
   var SEED_VERSION = 'v3_sat_sun_split';
@@ -8977,6 +9197,7 @@ function exportEsperaExcel() {
   window.addEventListener('focus', function() {
     if (cloudURL && Date.now() - lastSyncTime > 5000) cloudPull(function(){ refresh(); });
   });
+  wireWhatsAppButtons();
   // Auto-close mobile sidebar when nav item clicked
   var nis = document.querySelectorAll('.ni');
   for (var i=0;i<nis.length;i++) nis[i].addEventListener('click', function() {
