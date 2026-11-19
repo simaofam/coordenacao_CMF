@@ -2024,31 +2024,35 @@ function countAulas(profId) {
 }
 
 // ═══ ÉPOCA ═══
+function updateEpLabel() {
+  var el = document.getElementById('epLabel');
+  if (el) el.textContent = BASE_YEARS[curEp] + '/' + (BASE_YEARS[curEp] + 1);
+}
 function changeEpoca(dir) {
   curEp = Math.max(0, Math.min(BASE_YEARS.length-1, curEp+dir));
-  document.getElementById('epLabel').textContent = BASE_YEARS[curEp]+'/'+(BASE_YEARS[curEp]+1);
+  updateEpLabel();
   // seed new epoca if needed
   ensureEpocaSeeded();
   refresh();
 }
 
 function ensureEpocaSeeded() {
-  // If this pool+epoca has no data, copy professors from felgueiras_2025 (or current pool's 2025) as a starter
+  // Preenche o que falta numa época/piscina ainda sem equipa técnica.
+  // NUNCA substitui o objeto todo: havia aqui uma perda de dados — listas de
+  // espera, pedidos, ocupação, reuniões e alterações eram apagados ao trocar
+  // de piscina ou de época sempre que essa piscina ainda não tinha professores.
   var k = dbKey();
-  if (!DB[k] || (!DB[k].professors || !DB[k].professors.length)) {
-    // Use whatever profs were seeded for 2025 of this pool
-    var src = DB[curPool + '_2025'];
-    if (src) {
-      DB[k] = {
-        professors: JSON.parse(JSON.stringify(src.professors)),
-        schedule: {},
-        weekHoras: src.weekHoras ? src.weekHoras.slice() : [],
-        satHoras: src.satHoras ? src.satHoras.slice() : [],
-        sunHoras: src.sunHoras ? src.sunHoras.slice() : []
-      };
-      commit();
-    }
-  }
+  if (!DB[k]) DB[k] = {professors:[], schedule:{}, weekHoras:[], satHoras:[], sunHoras:[]};
+  var d = DB[k];
+  if (!d.schedule) d.schedule = {};
+  if (d.professors && d.professors.length) return;
+  var src = DB[curPool + '_2025'];
+  if (!src) return;
+  d.professors = JSON.parse(JSON.stringify(src.professors || []));
+  if (!d.weekHoras || !d.weekHoras.length) d.weekHoras = src.weekHoras ? src.weekHoras.slice() : [];
+  if (!d.satHoras  || !d.satHoras.length)  d.satHoras  = src.satHoras  ? src.satHoras.slice()  : [];
+  if (!d.sunHoras  || !d.sunHoras.length)  d.sunHoras  = src.sunHoras  ? src.sunHoras.slice()  : [];
+  commit();
 }
 
 // ═══ POOL ═══
@@ -8253,7 +8257,9 @@ var ESP_ESTADOS = [
   {key:'interessado', label:'Interessado',   color:'#2e7d32'},
   {key:'pensar',      label:'A pensar',      color:'#e65100'},
   {key:'naoatendeu',  label:'N&#227;o atendeu',  color:'#6a1b9a'},
+  {key:'seminteresse',label:'Sem interesse', color:'#78909c'},
   {key:'nao',         label:'J&#225; n&#227;o quer',  color:'#c62828'},
+  {key:'frequenta',   label:'J&#225; frequenta',  color:'#00838f'},
   {key:'inscrito',    label:'Inscrito',      color:'#1565c0'}
 ];
 // Conjugação de dias — lida da coluna "Horário" do e@Sport
@@ -10123,6 +10129,7 @@ function wireWhatsAppButtons() {
   window.addEventListener('focus', function() {
     if (cloudURL && Date.now() - lastSyncTime > 5000) cloudPull(function(){ refresh(); });
   });
+  updateEpLabel();
   wireWhatsAppButtons();
   // Auto-close mobile sidebar when nav item clicked
   var nis = document.querySelectorAll('.ni');
